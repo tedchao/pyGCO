@@ -1,3 +1,5 @@
+gco_source/*
+images/binary_*
 *.zip
 *.pyc
 *.o

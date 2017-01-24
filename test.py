@@ -64,7 +64,7 @@ def test_integer():
 
     labels = pygco.cut_general_graph(edges, edge_weight, unary, smooth,
                                      n_iter=1)
-    np.array_equal(labels, np.array([0, 2, 2, 1]))
+    assert np.array_equal(labels, np.array([0, 2, 2, 1]))
 
 
 def test_float():
@@ -80,7 +80,7 @@ def test_float():
 
     labels = pygco.cut_general_graph(edges, edge_weights, unary, smooth,
                                      n_iter=-1, algorithm="swap")
-    np.array_equal(labels, np.array([0, 2, 1]))
+    assert np.array_equal(labels, np.array([0, 2, 1]))
 
 
 def test_grid():
