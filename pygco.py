@@ -310,7 +310,7 @@ def cut_general_graph(edges, edge_weights, unary_cost, pairwise_cost,
     return labels
 
 
-def cut_general_graph_simple(edges, edge_weights, unary_cost, pairwise_cost,
+def cut_general_graph_simple(edges, edge_weights, unary_cost,
                              n_iter=-1, algorithm='expansion', init_labels=None,
                              down_weight_factor=None):
     """
