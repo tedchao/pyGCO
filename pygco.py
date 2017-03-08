@@ -310,6 +310,76 @@ def cut_general_graph(edges, edge_weights, unary_cost, pairwise_cost,
     return labels
 
 
+def cut_general_graph_simple(edges, edge_weights, unary_cost, pairwise_cost,
+                             n_iter=-1, algorithm='expansion', init_labels=None,
+                             down_weight_factor=None):
+    """
+    Apply multi-label graph cuts to arbitrary graph given by `edges`.
+
+    Parameters
+    ----------
+    edges: ndarray, int32, shape=(n_edges, 2)
+        Rows correspond to edges in graph, given as vertex indices. The indices
+        in the first column should always be smaller than corresponding indices
+        from the second column.
+    edge_weights: ndarray, int32 or float64, shape=(n_edges)
+        Weights for each edge, listed in the same order as edges.
+    unary_cost: ndarray, int32 or float64, shape=(n_vertices, n_labels)
+        Unary potentials
+    n_iter: int, (default=-1)
+        Number of iterations. n_iter=-1 means run the algorithm until convergence.
+    algorithm: string, `expansion` or `swap`, default=expansion
+        Whether to perform alpha-expansion or alpha-beta-swaps.
+    init_labels: ndarray, int32, shape=(n_vertices). Initial labels.
+    down_weight_factor: float or None. Used to scale down the energy terms, so
+        that they won't overflow once converted to integers. Default to None,
+        where this factor is set automatically.
+
+    Return
+    ------
+    labels: ndarray, int32, shape=(n_vertices) the resulting list of labels
+        after optimization.
+
+    Note all the node indices start from 0.
+    """
+    energy_is_float = (unary_cost.dtype in _float_types) or \
+        (edge_weights.dtype in _float_types)
+
+    if not energy_is_float and not (
+            (unary_cost.dtype in _int_types) and
+            (edge_weights.dtype in _int_types)):
+        raise DataTypeNotSupportedError(
+            "Unary and pairwise potentials should have consistent types. "
+            "Either integers of floats. Mixed types or other types are not "
+            "supported.")
+
+    n_sites, n_labels = unary_cost.shape
+
+    if down_weight_factor is None:
+        down_weight_factor = max(np.abs(unary_cost).max(),
+                                 np.abs(edge_weights).max()) + _SMALL_CONSTANT
+
+    gc = gco()
+    gc.createGeneralGraph(n_sites, n_labels, energy_is_float)
+    gc.setDataCost(unary_cost / down_weight_factor)
+    gc.setAllNeighbors(edges[:, 0], edges[:, 1], edge_weights / down_weight_factor)
+
+    # initialize labels
+    if init_labels is not None:
+        for i in range(n_sites):
+            gc.initLabelAtSite(i, init_labels[i])
+
+    if algorithm == 'expansion':
+        gc.expansion(n_iter)
+    else:
+        gc.swap(n_iter)
+
+    labels = gc.getLabels()
+    gc.destroyGraph()
+
+    return labels
+
+
 def cut_grid_graph(unary_cost, pairwise_cost, costV, costH,
                    n_iter=-1, algorithm='expansion'):
     """
