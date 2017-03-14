@@ -43,10 +43,18 @@ To include pygco in your code, simply import pygco module. See the documentation
 
 ## Show test results
 
-Visualisation of the unary terns for 3 labels segmentation
+Visualisation of the unary terns for **binary segmentation**
+
+![unary terms](./images/binary_unary.png)
+
+with the initial labeling (left) and estimated labeling with regularisation **1** (middle) and **0** (right)
+
+![labelling](./images/binary_labels.png)
+
+Visualisation of the unary terns for **3 labels segmentation**
 
 ![unary terms](./images/grid_unary.png)
 
-with the initial labeling (left) and estimated labeling (right)
+with the __initial__ labeling (left) and __estimated__ labeling (right)
 
 ![labelling](./images/grid_labels.png)
