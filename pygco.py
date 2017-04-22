@@ -1,6 +1,9 @@
 import numpy as np
 import ctypes as ct
-from cgco import _cgco
+try:
+    from cgco import _cgco
+except:
+    from .cgco import _cgco
 
 # keep 4 effective digits for the fractional part if using real potentials
 # make sure pairwise * smooth = unary so that the unary potentials and pairwise
