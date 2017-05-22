@@ -36,24 +36,26 @@ install:
   # directly to master instead of just PR builds (or the converse).
   # credits: JuliaLang developers.
   - pip install -r requirements.txt
-  - pip install nose coverage
+
+#before_build:
 #  - mkdir gco_source
+#  -
 
 build_script:
   # Build the compiled extension
-  - make download
-  - make all
-  - make test_wrapper
+  - nmake -f Makefile download
+  - nmake -f Makefile all
+  - nmake -f Makefile test_wrapper
 
 test_script:
+  - pip install nose coverage
   # Run the project tests
-  - ls *.so
 #  - ./test_wrapper
   - nosetests --with-coverage --cover-package=pygco
 
-after_test:
-  # If tests are successful, create binary packages for the project.
-  - coverage report
-
-#on_success:
+#after_test:
+#  # If tests are successful, create binary packages for the project.
 #  -
+
+on_success:
+  - coverage report
