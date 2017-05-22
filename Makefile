@@ -30,15 +30,15 @@ gco_source/LinkedBlockList.o: \
 	    -o gco_source/LinkedBlockList.o
 
 gco_source/graph.o: \
-    gco_source/graph.cpp gco_source/graph.h gco_source/block.h
+    gco_source/graph.inl gco_source/graph.h gco_source/block.h
 	$(CXX) $(CFLAGS) \
-	    -c gco_source/graph.cpp \
+	    -c -x c++ gco_source/graph.inl \
 	    -o gco_source/graph.o
 
 gco_source/maxflow.o: \
-    gco_source/block.h gco_source/graph.h gco_source/maxflow.cpp
+    gco_source/block.h gco_source/graph.h gco_source/maxflow.inl
 	$(CXX) $(CFLAGS) \
-	    -c gco_source/maxflow.cpp \
+	    -c -x c++ gco_source/maxflow.inl \
 	    -o gco_source/maxflow.o
 
 gco_source/GCoptimization.o: \
@@ -58,7 +58,7 @@ cgco.o: \
 test_wrapper: \
     test_wrapper.cpp
 	$(CXX) -L. test_wrapper.cpp \
-	    -o test_wrapper -lcgco
+	    -o test_wrapper -Wl,-rpath=. -lcgco
 
 clean:
 	rm -f *.o gco_source/*.o
@@ -67,5 +67,6 @@ rm:
 	rm -f *.o *.so gco_source/*.o *.zip
 
 download:
-	wget -N -O gco-v3.0.zip http://vision.csd.uwo.ca/code/gco-v3.0.zip
-	unzip -o gco-v3.0.zip -d  ./gco_source
+	./git_download.sh
+	#wget -N -O gco-v3.0.zip http://vision.csd.uwo.ca/code/gco-v3.0.zip
+	#unzip -o gco-v3.0.zip -d  ./gco_source
