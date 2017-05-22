@@ -1,7 +1,7 @@
 CXX=g++
 CFLAGS=-fPIC
 
-all: libcgco.so
+all: libcgco.so test_wrapper
 
 libcgco.so: \
     gco_source/LinkedBlockList.o gco_source/graph.o gco_source/maxflow.o \
@@ -61,7 +61,7 @@ test_wrapper: \
 	    -o test_wrapper -Wl,-rpath=. -lcgco
 
 clean:
-	rm -f *.o gco_source/*.o
+	rm -f *.o gco_source/*.o test_wrapper
 
 rm:
 	rm -f *.o *.so gco_source/*.o *.zip
