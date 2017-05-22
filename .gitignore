@@ -4,4 +4,3 @@ gco_source/*
 *.o
 *.so
 test_wrapper
-gco_source
