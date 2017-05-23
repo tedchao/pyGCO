@@ -1,4 +1,5 @@
 
+import pygco
 import pygco.pygco
 import pygco.cgco
 
