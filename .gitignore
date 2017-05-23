@@ -4,3 +4,6 @@ gco_source/*
 *.o
 *.so
 test_wrapper
+build
+__pycache__
+pygco.egg-info

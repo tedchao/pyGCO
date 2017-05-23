@@ -164,7 +164,7 @@ class gco(object):
     def set_smooth_cost(self, cost):
         """Set smooth cost. cost should be a symmetric numpy square matrix of
         size nb_labels x nb_labels.
-        
+
         cost[l1, l2] is the cost of labeling l1 as l2 (or l2 as l1)
         """
         if cost.shape[0] != cost.shape[1] or (cost != cost.T).any():

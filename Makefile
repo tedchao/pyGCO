@@ -1,5 +1,6 @@
 CXX=g++
 CFLAGS=-fPIC
+INC=-Igco_source -Ipygco
 
 all: libcgco.so test_wrapper
 
@@ -25,39 +26,39 @@ gco.so: \
 gco_source/LinkedBlockList.o: \
     gco_source/LinkedBlockList.cpp \
         gco_source/LinkedBlockList.h
-	$(CXX) $(CFLAGS) \
+	$(CXX) $(CFLAGS) $(INC) \
 	    -c gco_source/LinkedBlockList.cpp \
 	    -o gco_source/LinkedBlockList.o
 
 gco_source/graph.o: \
-    gco_source/graph.inl gco_source/graph.h gco_source/block.h
-	$(CXX) $(CFLAGS) \
-	    -c -x c++ gco_source/graph.inl \
+    gco_source/graph.cpp gco_source/graph.h gco_source/block.h
+	$(CXX) $(CFLAGS) $(INC) \
+	    -c -x c++ gco_source/graph.cpp \
 	    -o gco_source/graph.o
 
 gco_source/maxflow.o: \
-    gco_source/block.h gco_source/graph.h gco_source/maxflow.inl
-	$(CXX) $(CFLAGS) \
-	    -c -x c++ gco_source/maxflow.inl \
+    gco_source/block.h gco_source/graph.h gco_source/maxflow.cpp
+	$(CXX) $(CFLAGS) $(INC) \
+	    -c -x c++ gco_source/maxflow.cpp \
 	    -o gco_source/maxflow.o
 
 gco_source/GCoptimization.o: \
     gco_source/GCoptimization.cpp gco_source/GCoptimization.h \
         gco_source/LinkedBlockList.h gco_source/energy.h gco_source/graph.h \
         gco_source/graph.o gco_source/maxflow.o
-	$(CXX) $(CFLAGS) \
+	$(CXX) $(CFLAGS) $(INC) \
 	    -c gco_source/GCoptimization.cpp \
 	    -o gco_source/GCoptimization.o
 
 cgco.o: \
-    cgco.cpp gco_source/GCoptimization.h
-	$(CXX) $(CFLAGS) \
-	    -c cgco.cpp \
+    pygco/cgco.cpp gco_source/GCoptimization.h
+	$(CXX) $(CFLAGS) $(INC) \
+	    -c pygco/cgco.cpp \
 	    -o cgco.o
 
 test_wrapper: \
     test_wrapper.cpp
-	$(CXX) -L. test_wrapper.cpp \
+	$(CXX) $(INC) -L. test_wrapper.cpp \
 	    -o test_wrapper -Wl,-rpath=. -lcgco
 
 clean:
