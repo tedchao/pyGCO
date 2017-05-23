@@ -10,9 +10,25 @@ import os
 from pip.req import parse_requirements
 import pkg_resources
 import pip
+import subprocess
+
+source_directory = "gco_source"
+
+if subprocess.call(["git", "rev-parse", "--resolve-git-dir",
+                   os.path.join(source_directory, ".git")],
+                   stderr=subprocess.STDOUT,
+                   stdout=open(os.devnull, 'w')) != 0:
+    print("Download the code")
+    subprocess.call(['./git_download.sh'])
+else:
+    print("Assume you have the code")
+
+
+
+
 
 pygco_directory = "pygco"
-source_directory = "gco_source"
+
 
 files = ['GCoptimization.cpp', 'graph.cpp', 'LinkedBlockList.cpp',
          'maxflow.cpp']
