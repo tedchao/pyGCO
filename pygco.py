@@ -1,3 +1,5 @@
+#!/bin/env python
+
 import numpy as np
 import ctypes as ct
 from cgco import _cgco

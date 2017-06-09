@@ -120,7 +120,7 @@ def test_grid():
     plt.subplot(1, 2, 2), plt.title('resulting labeling')
     plt.imshow(labels.reshape(*annot.shape), interpolation="nearest")
     plt.contour(annot, colors='w')
-    fig.tight_layout(), fig.savefig('./images/grid_labels.png')
+    fig.tight_layout(), fig.savefig('./images/grid_labels.png'), plt.close()
 
 
 def test_binary():
@@ -168,7 +168,7 @@ def test_binary():
     plt.subplot(1, 3, 3), plt.title('labeling (smooth=0)')
     plt.imshow(labels_0.reshape(*annot.shape), interpolation='nearest')
     plt.contour(annot, colors='w')
-    fig.tight_layout(), fig.savefig('./images/binary_labels.png')
+    fig.tight_layout(), fig.savefig('./images/binary_labels.png'), plt.close()
 
 
 if __name__ == "__main__":

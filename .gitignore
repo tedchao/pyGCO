@@ -4,3 +4,5 @@ gco_source/*
 *.o
 *.so
 test_wrapper
+.coverage
+.idea

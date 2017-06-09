@@ -1,8 +1,11 @@
 # pygco: a python wrapper for the graph cuts package
 
 [![Codeship Status for Borda/pygco](https://app.codeship.com/projects/a130c6b0-c251-0134-f78c-26017824c46f/status?branch=master)](https://app.codeship.com/projects/197423)
-[![Build Status](https://travis-ci.org/Borda/pygco.svg?branch=master)](https://travis-ci.org/Borda/pygco)
+[![Build Status](https://travis-ci.org/Borda/pyGCO.svg?branch=master)](https://travis-ci.org/Borda/pyGCO)
+[![codecov](https://codecov.io/gh/Borda/pyGCO/branch/master/graph/badge.svg)](https://codecov.io/gh/Borda/pyGCO)
 [![Build status](https://ci.appveyor.com/api/projects/status/ovfsssqdb1c0xg0l?svg=true)](https://ci.appveyor.com/project/Borda/pygco)
+[![Run Status](https://api.shippable.com/projects/5883a5e12a5d900f00b8b9ff/badge?branch=master)](https://app.shippable.com/github/Borda/pyGCO)
+[![Coverage Badge](https://api.shippable.com/projects/5883a5e12a5d900f00b8b9ff/coverageBadge?branch=master)](https://app.shippable.com/github/Borda/pyGCO)
 
 This is a python wrapper for [gco-v3.0 package](http://vision.csd.uwo.ca/code/), which implements a graph cuts based move-making algorithm for optimization in Markov Random Fields.
 
