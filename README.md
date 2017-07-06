@@ -16,7 +16,7 @@ It contains a copy of the **gco-v3.0 package**.  Some of the design were borrowe
 
 This wrapper is composed of two parts, a C wrapper and a python wrapper.
 
-##Implemented functions
+## Implemented functions
  * **cut_general_graph**(...)
  * **cut_grid_graph**(...)
  * **cut_grid_graph_simple**(...)

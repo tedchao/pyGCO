@@ -10,6 +10,7 @@ sudo: true
 python:
   - 2.7
   - 3.4
+  - 3.5
 
 cache: pip
 
@@ -23,10 +24,14 @@ before_install:
 
 install:
   - pip install -r requirements.txt
-  - pip install pytest nose coverage codecov
-#  - make download
-#  - make all
-#  - make test_wrapper
+  - pip install pytest>=3.1.3 coverage codecov nose  #
+
+  - make download
+  - make all
+  - make test_wrapper
+  - ls libcgco.*
+  - make rm
+
   - python setup.py build_ext --inplace
 #  - python setup.py install
 
@@ -35,12 +40,12 @@ before_script:
   - mkdir -p shippable/codecoverage
 
 script:
-#  - ls *.so
+  - ls libcgco.*
 #  - ./test_wrapper
-  - python -m pytest
+  - python -m pytest --doctest-modules --ignore=setup.py
   - coverage run --source=pygco test_examples.py
+  - coverage xml -o shippable/codecoverage/coverage.xml
 
 after_success:
-  - echo Build succesful!
-  - codecov --token=1aef0194-048a-4c59-a0d1-9408b924c493
+  - codecov -t 1aef0194-048a-4c59-a0d1-9408b924c493
   - coverage report

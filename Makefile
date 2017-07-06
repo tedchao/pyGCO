@@ -65,7 +65,8 @@ clean:
 	rm -f test_wrapper
 
 rm:
-	rm -f *.o *.so gco_source/*.o *.zip
+	rm -f *.o *.so *.zip
+	rm -r -f gco_source/
 	rm -f test_wrapper
 
 download:

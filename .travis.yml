@@ -14,6 +14,7 @@ sudo: required
 python:
   - 2.7
   - 3.4
+  - 3.5
 
 # See http://docs.travis-ci.com/user/caching/#pip-cache
 cache: pip
@@ -26,20 +27,25 @@ before_install:
 
 install:
   - pip install -r requirements.txt --user
-  - pip install coverage pytest --user  # nose codecov
-#  - make download
-#  - make all
-#  - make test_wrapper
+  - pip install pytest>=3.1.3 coverage codecov nose --user
+
+  - make download
+  - make all
+  - make test_wrapper
+  - ls libcgco.*
+  - make rm
+
   - python setup.py build_ext --inplace
 #  - python setup.py install
 
 script:
-#  - ls *.so
+  - ls libcgco.*
 #  - ./test_wrapper
-  - pytest
+  - nosetests pygco.py --exe --with-doctest --with-coverage
+  - nosetests test_examples.py --exe --with-doctest --with-coverage
+  - pytest --doctest-modules --ignore=setup.py
   - coverage run --source=pygco test_examples.py
 
 after_success:
-  - echo Build succesful!
   - codecov --token=1aef0194-048a-4c59-a0d1-9408b924c493
   - coverage report

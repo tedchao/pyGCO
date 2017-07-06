@@ -48,43 +48,45 @@ PLOT_SIZE = 6
 #     return [edges, edge_weights]
 
 
-class TestGCO(unittest.TestCase):
 
-    def test_gc(self):
-        """  """
-        gc = pygco.gco()
-        gc.createGeneralGraph(3, 2, True)
-        gc.handle is not None
-        gc.destroy_graph()
 
-    def test_integer(self):
-        """  """
-        unary = np.array([[2, 8, 8],
-                          [7, 3, 7],
-                          [8, 8, 2],
-                          [6, 4, 6]])
-        edges = np.array([[0, 1], [1, 2], [2, 3]])
-        edge_weight = np.array([3, 10, 1])
-        smooth = 1 - np.eye(3)
+def test_gc():
+    """  """
+    gc = pygco.gco()
+    gc.createGeneralGraph(3, 2, True)
+    gc.handle is not None
+    gc.destroy_graph()
 
-        labels = pygco.cut_general_graph(edges, edge_weight, unary, smooth,
-                                         n_iter=1)
-        assert np.array_equal(labels, np.array([0, 2, 2, 1]))
 
-    def test_float(self):
-        """  """
-        unary = np.array([[0.0, 1.0, 2.0],
-                          [4.0, 1.0, 0.0],
-                          [1.0, 0.0, 2.0]])
-        edges = np.array([[0, 1],
-                          [1, 2],
-                          [0, 2]]).astype(np.int32)
-        smooth = (1 - np.eye(3)).astype(np.float)
-        edge_weights = np.array([2.0, 0.0, 0.0])
+def test_integer():
+    """  """
+    unary = np.array([[2, 8, 8],
+                      [7, 3, 7],
+                      [8, 8, 2],
+                      [6, 4, 6]])
+    edges = np.array([[0, 1], [1, 2], [2, 3]])
+    edge_weight = np.array([3, 10, 1])
+    smooth = 1 - np.eye(3)
 
-        labels = pygco.cut_general_graph(edges, edge_weights, unary, smooth,
-                                         n_iter=-1, algorithm="swap")
-        assert np.array_equal(labels, np.array([0, 2, 1]))
+    labels = pygco.cut_general_graph(edges, edge_weight, unary, smooth,
+                                     n_iter=1)
+    assert np.array_equal(labels, np.array([0, 2, 2, 1]))
+
+
+def test_float():
+    """  """
+    unary = np.array([[0.0, 1.0, 2.0],
+                      [4.0, 1.0, 0.0],
+                      [1.0, 0.0, 2.0]])
+    edges = np.array([[0, 1],
+                      [1, 2],
+                      [0, 2]]).astype(np.int32)
+    smooth = (1 - np.eye(3)).astype(np.float)
+    edge_weights = np.array([2.0, 0.0, 0.0])
+
+    labels = pygco.cut_general_graph(edges, edge_weights, unary, smooth,
+                                     n_iter=-1, algorithm="swap")
+    assert np.array_equal(labels, np.array([0, 2, 1]))
 
 
 def test_grid():
@@ -169,6 +171,16 @@ def test_binary():
     plt.imshow(labels_0.reshape(*annot.shape), interpolation='nearest')
     plt.contour(annot, colors='w')
     fig.tight_layout(), fig.savefig('./images/binary_labels.png'), plt.close()
+
+
+class TestGCO(unittest.TestCase):
+
+    def test_all(self):
+        test_gc()
+        test_integer()
+        test_float()
+        test_binary()
+        test_grid()
 
 
 if __name__ == "__main__":

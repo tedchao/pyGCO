@@ -249,7 +249,8 @@ class gco(object):
 
 
 def cut_general_graph(edges, edge_weights, unary_cost, pairwise_cost, 
-        n_iter=-1, algorithm='expansion', init_labels=None, down_weight_factor=None):
+                      n_iter=-1, algorithm='expansion', init_labels=None,
+                      down_weight_factor=None):
     """
     Apply multi-label graph cuts to arbitrary graph given by `edges`.
 
@@ -280,6 +281,18 @@ def cut_general_graph(edges, edge_weights, unary_cost, pairwise_cost,
         after optimization.
 
     Note all the node indices start from 0.
+
+    >>> edges = np.array([(i, i + 1) for i in range(4)] + # first row
+    ...                  [(i, i + 5) for i in range(5)] + # inter rows
+    ...                  [(i, i + 1) for i in range(5, 9)]) # second row
+    >>> weights = np.array([1] * len(edges))
+    >>> unary = np.zeros((10, 2))
+    >>> unary[5:, 0] = 1.
+    >>> unary[:5, 1] = 1.
+    >>> pairwise = (1 - np.eye(unary.shape[1])) * 0.5
+    >>> labels = cut_general_graph(edges, weights, unary, pairwise)
+    >>> labels
+    array([0, 0, 0, 0, 0, 1, 1, 1, 1, 1], dtype=int32)
     """
     energy_is_float = (unary_cost.dtype in _float_types) or \
             (edge_weights.dtype in _float_types) or \
@@ -418,6 +431,41 @@ def cut_grid_graph_simple(unary_cost, pairwise_cost, n_iter=-1,
         Whether to perform alpha-expansion or alpha-beta-swaps.
 
     Note all the node indices start from 0.
+
+    >>> annot = np.zeros((10, 10), dtype=int)
+    >>> annot[:, 6:] = 2
+    >>> annot[1:6, 3:8] = 1
+    >>> annot
+    array([[0, 0, 0, 0, 0, 0, 2, 2, 2, 2],
+           [0, 0, 0, 1, 1, 1, 1, 1, 2, 2],
+           [0, 0, 0, 1, 1, 1, 1, 1, 2, 2],
+           [0, 0, 0, 1, 1, 1, 1, 1, 2, 2],
+           [0, 0, 0, 1, 1, 1, 1, 1, 2, 2],
+           [0, 0, 0, 1, 1, 1, 1, 1, 2, 2],
+           [0, 0, 0, 0, 0, 0, 2, 2, 2, 2],
+           [0, 0, 0, 0, 0, 0, 2, 2, 2, 2],
+           [0, 0, 0, 0, 0, 0, 2, 2, 2, 2],
+           [0, 0, 0, 0, 0, 0, 2, 2, 2, 2]])
+    >>> np.random.seed(0)
+    >>> noise = np.random.randn(*annot.shape)
+    >>> unary = np.tile(noise[:, :, np.newaxis], [1, 1, 3])
+    >>> unary[:, :, 0] += 1 - (annot == 0)
+    >>> unary[:, :, 1] += 1 - (annot == 1)
+    >>> unary[:, :, 2] += 1 - (annot == 2)
+    >>> pairwise = (1 - np.eye(3)) * 0.5
+    >>> labels = cut_grid_graph_simple(unary, pairwise, n_iter=-1)
+    >>> labels.reshape(annot.shape).astype(int)
+    array([[0, 0, 0, 0, 0, 0, 2, 2, 2, 2],
+           [0, 0, 0, 1, 1, 1, 1, 1, 2, 2],
+           [0, 0, 0, 1, 1, 1, 1, 1, 2, 2],
+           [0, 0, 0, 1, 1, 1, 1, 1, 2, 2],
+           [0, 0, 0, 1, 1, 1, 1, 1, 2, 2],
+           [0, 0, 0, 1, 1, 1, 1, 1, 2, 2],
+           [0, 0, 0, 0, 0, 0, 2, 2, 2, 2],
+           [0, 0, 0, 0, 0, 0, 2, 2, 2, 2],
+           [0, 0, 0, 0, 0, 0, 2, 2, 2, 2],
+           [0, 0, 0, 0, 0, 0, 2, 2, 2, 2]])
+
     """
     height, width, n_labels = unary_cost.shape
     cost_v = np.ones((height-1, width), dtype=unary_cost.dtype)

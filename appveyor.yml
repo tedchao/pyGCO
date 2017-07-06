@@ -47,7 +47,9 @@ build_script:
 #  - nmake -f Makefile download
 #  - nmake -f Makefile all
 #  - nmake -f Makefile test_wrapper
-  - python setup.py install
+  - python setup.py build_ext --inplace
+#  - python setup.py install
+  - dir
 
 test_script:
   # Run the project tests

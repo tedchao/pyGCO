@@ -4,12 +4,17 @@ import os, glob
 
 # or change this to your own path that contains libcgco.so
 _CGCO_LIB_PATH = os.path.dirname(os.path.abspath(os.path.realpath(__file__)))
+LIB_NAME = 'libcgco'
 
-LIST_LIBGCO = glob.glob(os.path.join(_CGCO_LIB_PATH, 'libcgco.*'))
+LIST_LIBGCO = glob.glob(os.path.join(_CGCO_LIB_PATH, LIB_NAME + '.*'))
 assert len(LIST_LIBGCO) > 0, 'nothing found: %s' % repr(LIST_LIBGCO)
-if 'libcgco.so' in [os.path.basename(p) for p in LIST_LIBGCO]:
-    _CGCO_LIB_NAME = os.path.join(_CGCO_LIB_PATH, 'libcgco.so')
+lib_exts = [os.path.splitext(os.path.basename(p))[1] for p in LIST_LIBGCO]
+if '.so' in lib_exts:
+    _CGCO_LIB_NAME = LIST_LIBGCO[lib_exts.index('.so')]
+elif '.lib' in lib_exts:
+    _CGCO_LIB_NAME = LIST_LIBGCO[lib_exts.index('.lib')]
 else:  # not sure what it found...
+    print('found libs: %s' % repr([os.path.basename(p) for p in LIST_LIBGCO]))
     _CGCO_LIB_NAME = os.path.basename(LIST_LIBGCO[0])
 assert os.path.exists(_CGCO_LIB_PATH), '%s' % _CGCO_LIB_PATH
 
