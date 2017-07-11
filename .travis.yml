@@ -41,8 +41,8 @@ install:
 script:
   - ls libcgco.*
 #  - ./test_wrapper
-  - nosetests pygco.py --exe --with-doctest --with-coverage
-  - nosetests test_examples.py --exe --with-doctest --with-coverage
+  - nosetests pygco.py --exe --with-doctest
+  - nosetests test_examples.py --exe --with-doctest
   - pytest --doctest-modules --ignore=setup.py
   - coverage run --source=pygco test_examples.py
 

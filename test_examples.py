@@ -3,8 +3,7 @@ import unittest
 
 import numpy as np
 import matplotlib
-# Force matplotlib to not use any Xwindows backend.
-matplotlib.use('Agg')
+matplotlib.use('Agg') # Force matplotlib to not use any Xwindows backend.
 import matplotlib.pyplot as plt
 
 import pygco
@@ -95,6 +94,7 @@ def test_grid():
     annot[:, 60:] = 2
     annot[15:65, 35:85] = 1
 
+    np.random.seed(0)
     noise = annot + np.random.randn(*annot.shape)
 
     unary = np.tile(noise[:, :, np.newaxis], [1, 1, 3])
@@ -104,31 +104,35 @@ def test_grid():
     unary[:, :, 1] = tmp
     unary[:, :, 2] = 2 - unary[:, :, 2]
 
-    fig = plt.figure(figsize=(unary.shape[-1] * PLOT_SIZE, PLOT_SIZE))
+    fig, axarr = plt.subplots(ncols=unary.shape[-1],
+                              figsize=(unary.shape[-1] * PLOT_SIZE, PLOT_SIZE))
     for i in range(unary.shape[-1]):
-        plt.subplot(1, unary.shape[-1], i + 1)
-        plt.title('unary term #%i' % i)
-        plt.imshow(unary[:, :, i], cmap='gray', interpolation='nearest')
-        plt.colorbar()  # , plt.contour(annot, colors='r')
+        axarr[i].set_title('unary term #%i' % i)
+        bm = axarr[i].imshow(unary[:, :, i], cmap='gray',
+                             interpolation='nearest')
+        plt.colorbar(bm, ax=axarr[i])  # , plt.contour(annot, colors='r')
 
-    fig.tight_layout(), fig.savefig('./images/grid_unary.png')
+    fig.tight_layout()
+    fig.savefig('./images/grid_unary.png')
 
     pairwise = (1 - np.eye(3)) * 10
     labels = pygco.cut_grid_graph_simple(unary, pairwise, n_iter=-1)
 
-    fig = plt.figure(figsize=(2 * PLOT_SIZE, PLOT_SIZE))
-    plt.subplot(1, 2, 1), plt.title('original annotation')
-    plt.imshow(annot, interpolation="nearest")
-    plt.subplot(1, 2, 2), plt.title('resulting labeling')
-    plt.imshow(labels.reshape(*annot.shape), interpolation="nearest")
-    plt.contour(annot, colors='w')
-    fig.tight_layout(), fig.savefig('./images/grid_labels.png'), plt.close()
+    fig, axarr = plt.subplots(ncols=2, figsize=(2 * PLOT_SIZE, PLOT_SIZE))
+    axarr[0].set_title('original annotation')
+    axarr[0].imshow(annot, interpolation="nearest")
+    axarr[1].set_title('resulting labeling')
+    axarr[1].imshow(labels.reshape(*annot.shape), interpolation="nearest")
+    axarr[1].contour(annot, colors='w')
+    fig.tight_layout()
+    fig.savefig('./images/grid_labels.png'), plt.close()
 
 
 def test_binary():
     """  """
     annot = np.zeros((100, 100))
     annot[20:70, 30:80] = 1
+    np.random.seed(0)
     img = np.random.randn(*annot.shape)
     img += 2 * annot - 1
 
@@ -141,13 +145,14 @@ def test_binary():
     unary[:, :, 1] = -img
     unary += 4
 
-    fig = plt.figure(figsize=(unary.shape[-1] * PLOT_SIZE, PLOT_SIZE))
+    fig, axarr = plt.subplots(ncols=unary.shape[-1],
+                              figsize=(unary.shape[-1] * PLOT_SIZE, PLOT_SIZE))
     for i in range(unary.shape[-1]):
-        plt.subplot(1, unary.shape[-1], i + 1)
-        plt.title('unary term #%i' % i)
-        plt.imshow(unary[:, :, i], cmap='gray', interpolation='nearest')
-        plt.colorbar()  # , plt.contour(annot, colors='r')
-    fig.tight_layout(), fig.savefig('./images/binary_unary.png')
+        axarr[i].set_title('unary term #%i' % i)
+        bm = axarr[i].imshow(unary[:, :, i], cmap='gray', interpolation='nearest')
+        plt.colorbar(bm, ax=axarr[i])  # , plt.contour(annot, colors='r')
+    fig.tight_layout()
+    fig.savefig('./images/binary_unary.png')
 
     # edges, edge_weights = get_uniform_smoothness_pw_single_image(img.shape)
     smooth = 1 - np.eye(2)
@@ -160,17 +165,34 @@ def test_binary():
     labels = pygco.cut_grid_graph_simple(unary, smooth, n_iter=-1)
     labels_0 = pygco.cut_grid_graph_simple(unary, smooth * 0., n_iter=-1)
 
-    fig = plt.figure(figsize=(3 * PLOT_SIZE, PLOT_SIZE))
-    plt.subplot(1, 3, 1), plt.title('image')
-    plt.imshow(img, cmap='gray', interpolation='nearest')
-    plt.contour(annot, colors='r')
-    plt.subplot(1, 3, 2), plt.title('labeling (smooth=1)')
-    plt.imshow(labels.reshape(*annot.shape), interpolation='nearest')
-    plt.contour(annot, colors='w')
-    plt.subplot(1, 3, 3), plt.title('labeling (smooth=0)')
-    plt.imshow(labels_0.reshape(*annot.shape), interpolation='nearest')
-    plt.contour(annot, colors='w')
-    fig.tight_layout(), fig.savefig('./images/binary_labels.png'), plt.close()
+    fig, axarr = plt.subplots(ncols=3, figsize=(3 * PLOT_SIZE, PLOT_SIZE))
+    axarr[0].set_title('image')
+    axarr[0].imshow(img, cmap='gray', interpolation='nearest')
+    axarr[0].contour(annot, colors='r')
+    axarr[1].set_title('labeling (smooth=1)')
+    axarr[1].imshow(labels.reshape(*annot.shape), interpolation='nearest')
+    axarr[1].contour(annot, colors='w')
+    axarr[2].set_title('labeling (smooth=0)')
+    axarr[2].imshow(labels_0.reshape(*annot.shape), interpolation='nearest')
+    axarr[2].contour(annot, colors='w')
+    fig.tight_layout()
+    fig.savefig('./images/binary_labels-4conn.png'), plt.close()
+
+    labels = pygco.cut_grid_graph_simple(unary, smooth, connect=8, n_iter=-1)
+    labels_0 = pygco.cut_grid_graph_simple(unary, smooth * 0., connect=8, n_iter=-1)
+
+    fig, axarr = plt.subplots(ncols=3, figsize=(3 * PLOT_SIZE, PLOT_SIZE))
+    axarr[0].set_title('image')
+    axarr[0].imshow(img, cmap='gray', interpolation='nearest')
+    axarr[0].contour(annot, colors='r')
+    axarr[1].set_title('labeling (smooth=1)')
+    axarr[1].imshow(labels.reshape(*annot.shape), interpolation='nearest')
+    axarr[1].contour(annot, colors='w')
+    axarr[2].set_title('labeling (smooth=0)')
+    axarr[2].imshow(labels_0.reshape(*annot.shape), interpolation='nearest')
+    axarr[2].contour(annot, colors='w')
+    fig.tight_layout()
+    fig.savefig('./images/binary_labels-8conn.png'), plt.close()
 
 
 class TestGCO(unittest.TestCase):

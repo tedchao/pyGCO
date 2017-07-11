@@ -40,9 +40,18 @@ labels = [ 0 2 2 1 ], energy=19
 data energy=15, smooth energy=4
 ```
 
-Next test the python wrapper using `python test.py`, if it works fine you are ready to use pygco.
+Next test the python wrapper using `python test_examples.py`, if it works fine you are ready to use pygco.
 
 To include pygco in your code, simply import pygco module. See the documentation inside code for more details.
+
+## Install wrapper
+
+Clone repository and enter folder, then
+
+```
+pip install -r requirements.txt
+python setup.py install
+```
 
 ## Show test results
 
@@ -50,9 +59,13 @@ Visualisation of the unary terns for **binary segmentation**
 
 ![unary terms](./images/binary_unary.png)
 
-with the initial labeling (left) and estimated labeling with regularisation **1** (middle) and **0** (right)
+**4-connected** components with the initial labeling (left) and estimated labeling with regularisation **1** (middle) and **0** (right)
 
-![labelling](./images/binary_labels.png)
+![labelling](./images/binary_labels-4conn.png)
+
+**8-connected** components with the initial labeling (left) and estimated labeling with regularisation **1** (middle) and **0** (right)
+
+![labelling](./images/binary_labels-8conn.png)
 
 Visualisation of the unary terns for **3 labels segmentation**
 

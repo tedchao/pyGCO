@@ -336,8 +336,70 @@ def cut_general_graph(edges, edge_weights, unary_cost, pairwise_cost,
     return labels
 
 
-def cut_grid_graph(unary_cost, pairwise_cost, cost_v, cost_h, n_iter=-1,
-                   algorithm='expansion'):
+def get_images_edges_vh(height, width):
+    """ assuming uniform grid get vertical and horizontal edges
+
+    :param int height: image height
+    :param int width: image width
+    :return: ndarray, ndarray, ndarray, ndarray
+
+    >>> np.arange(2 * 3).reshape(2, 3)
+    array([[0, 1, 2],
+           [3, 4, 5]])
+    >>> v_from, h_from, v_to, h_to = get_images_edges_vh(2, 3)
+    >>> v_from
+    array([0, 1, 2])
+    >>> v_to
+    array([3, 4, 5])
+    >>> h_from
+    array([0, 1, 3, 4])
+    >>> h_to
+    array([1, 2, 4, 5])
+    """
+    idxs = np.arange(height * width).reshape(height, width)
+    v_edges_from = idxs[:-1, :].flatten()
+    v_edges_to = idxs[1:, :].flatten()
+
+    h_edges_from = idxs[:, :-1].flatten()
+    h_edges_to = idxs[:, 1:].flatten()
+
+    return v_edges_from, h_edges_from, v_edges_to, h_edges_to
+
+
+def get_images_edges_diag(height, width):
+    """ assuming uniform grid get diagonal edges:
+    * top left -> bottom right
+    * top right -> bottom left
+
+    :param int height: image height
+    :param int width: image width
+    :return: ndarray, ndarray, ndarray, ndarray
+
+    >>> np.arange(2 * 3).reshape(2, 3)
+    array([[0, 1, 2],
+           [3, 4, 5]])
+    >>> dr_from, dl_from, dr_to, dl_to = get_images_edges_diag(2, 3)
+    >>> dr_from
+    array([0, 1])
+    >>> dr_to
+    array([4, 5])
+    >>> dl_from
+    array([1, 2])
+    >>> dl_to
+    array([3, 4])
+    """
+    idxs = np.arange(height * width).reshape(height, width)
+    dr_edges_from = idxs[:-1, :-1].flatten()
+    dr_edges_to = idxs[1:, 1:].flatten()
+
+    dl_edges_to = idxs[1:, :-1].flatten()
+    dl_edges_from = idxs[:-1, 1:].flatten()
+
+    return dr_edges_from, dl_edges_from, dr_edges_to, dl_edges_to
+
+
+def cut_grid_graph(unary_cost, pairwise_cost, cost_v, cost_h, cost_dr=None,
+                   cost_dl=None, n_iter=-1, algorithm='expansion'):
     """
     Apply multi-label graphcuts to grid graph.
 
@@ -352,7 +414,13 @@ def cut_grid_graph(unary_cost, pairwise_cost, cost_v, cost_h, n_iter=-1,
         cost_v[i,j] is the edge weight between (i,j) and (i+1,j)
     cost_h: ndarray, int32, shape=(height, width-1)
         Horizontal edge weights.
-        costH[i,j] is the edge weight between (i,j) and (i,j+1)
+        cost_h[i,j] is the edge weight between (i,j) and (i,j+1)
+    cost_dr: ndarray, int32, shape=(height-1, width-1)
+        Diagonal edge weights.
+        cost_dr[i,j] is the edge weight between (i,j) and (i+1,j+1)
+    cost_dl: ndarray, int32, shape=(height-1, width-1)
+        Diagonal edge weights.
+        cost_dl[i,j] is the edge weight between (i,j+1) and (i+1,j)
     n_iter: int, (default=-1)
         Number of iterations.
         Set it to -1 will run the algorithm until convergence
@@ -382,20 +450,36 @@ def cut_grid_graph(unary_cost, pairwise_cost, cost_v, cost_h, n_iter=-1,
     gc.createGeneralGraph(height * width, n_labels, energy_is_float)
     gc.set_data_cost(unary_cost.reshape([height * width, n_labels]))
 
-    v_edges_from = np.arange((height-1) * width)
-    v_edges_to = v_edges_from + width
+    v_edges_from, h_edges_from, v_edges_to, h_edges_to = \
+        get_images_edges_vh(height, width)
     v_edges_w = cost_v.flatten()
-
-    h_edges_from = np.arange(width-1)
-    h_edges_from = np.tile(h_edges_from[np.newaxis, :], [height, 1])
-    h_step = np.arange(height) * width
-    h_edges_from = (h_edges_from + h_step[:, np.newaxis]).flatten()
-    h_edges_to = h_edges_from + 1
+    assert len(v_edges_from) == len(v_edges_w), \
+        'different sizes of edges %i and weights %i' \
+        % (len(v_edges_from), len(v_edges_w))
     h_edges_w = cost_h.flatten()
+    assert len(h_edges_from) == len(h_edges_w), \
+        'different sizes of edges %i and weights %i' \
+        % (len(h_edges_from), len(h_edges_w))
 
     edges_from = np.r_[v_edges_from, h_edges_from]
     edges_to = np.r_[v_edges_to, h_edges_to]
     edges_w = np.r_[v_edges_w, h_edges_w]
+
+    if cost_dr is not None and cost_dl is not None:
+        dr_edges_from, dl_edges_from, dr_edges_to, dl_edges_to = \
+            get_images_edges_diag(height, width)
+        dr_edges_w = cost_dr.flatten()
+        assert len(dr_edges_from) == len(dr_edges_w), \
+            'different sizes of edges %i and weights %i' \
+            % (len(dr_edges_from), len(dr_edges_w))
+        dl_edges_w = cost_dl.flatten()
+        assert len(dl_edges_from) == len(dl_edges_w), \
+            'different sizes of edges %i and weights %i' \
+            % (len(dl_edges_from), len(dl_edges_w))
+
+        edges_from = np.r_[edges_from, dr_edges_from, dl_edges_from]
+        edges_to = np.r_[edges_to, dr_edges_to, dl_edges_to]
+        edges_w = np.r_[edges_w, dr_edges_w, dl_edges_w]
 
     gc.set_all_neighbors(edges_from, edges_to, edges_w)
 
@@ -413,7 +497,7 @@ def cut_grid_graph(unary_cost, pairwise_cost, cost_v, cost_h, n_iter=-1,
 
 
 def cut_grid_graph_simple(unary_cost, pairwise_cost, n_iter=-1,
-                          algorithm='expansion'):
+                          connect=4, algorithm='expansion'):
     """
     Apply multi-label graphcuts to grid graph. This is a simplified version of
     cut_grid_graph, with all edge weights set to 1.
@@ -424,6 +508,7 @@ def cut_grid_graph_simple(unary_cost, pairwise_cost, n_iter=-1,
         Unary potentials
     pairwise_cost: ndarray, int32, shape=(n_labels, n_labels)
         Pairwise potentials for label compatibility
+    connect: int, number of connected components - 4 or 8
     n_iter: int, (default=-1)
         Number of iterations.
         Set it to -1 will run the algorithm until convergence
@@ -453,7 +538,7 @@ def cut_grid_graph_simple(unary_cost, pairwise_cost, n_iter=-1,
     >>> unary[:, :, 1] += 1 - (annot == 1)
     >>> unary[:, :, 2] += 1 - (annot == 2)
     >>> pairwise = (1 - np.eye(3)) * 0.5
-    >>> labels = cut_grid_graph_simple(unary, pairwise, n_iter=-1)
+    >>> labels = cut_grid_graph_simple(unary, pairwise, n_iter=100)
     >>> labels.reshape(annot.shape).astype(int)
     array([[0, 0, 0, 0, 0, 0, 2, 2, 2, 2],
            [0, 0, 0, 1, 1, 1, 1, 1, 2, 2],
@@ -465,11 +550,30 @@ def cut_grid_graph_simple(unary_cost, pairwise_cost, n_iter=-1,
            [0, 0, 0, 0, 0, 0, 2, 2, 2, 2],
            [0, 0, 0, 0, 0, 0, 2, 2, 2, 2],
            [0, 0, 0, 0, 0, 0, 2, 2, 2, 2]])
-
+    >>> labels = cut_grid_graph_simple(unary, pairwise, connect=8, n_iter=100)
+    >>> labels.reshape(annot.shape).astype(int)
+    array([[0, 0, 0, 0, 1, 1, 1, 2, 2, 2],
+           [0, 0, 0, 1, 1, 1, 1, 1, 2, 2],
+           [0, 0, 0, 1, 1, 1, 1, 1, 2, 2],
+           [0, 0, 0, 1, 1, 1, 1, 1, 2, 2],
+           [0, 0, 0, 1, 1, 1, 1, 1, 2, 2],
+           [0, 0, 0, 1, 1, 1, 1, 1, 2, 2],
+           [0, 0, 0, 0, 0, 0, 2, 2, 2, 2],
+           [0, 0, 0, 0, 0, 0, 2, 2, 2, 2],
+           [0, 0, 0, 0, 0, 0, 2, 2, 2, 2],
+           [0, 0, 0, 0, 0, 0, 2, 2, 2, 2]])
     """
     height, width, n_labels = unary_cost.shape
-    cost_v = np.ones((height-1, width), dtype=unary_cost.dtype)
-    cost_h = np.ones((height, width-1), dtype=unary_cost.dtype)
+    cost_v = np.ones((height - 1, width), dtype=unary_cost.dtype)
+    cost_h = np.ones((height, width - 1), dtype=unary_cost.dtype)
 
-    return cut_grid_graph(unary_cost, pairwise_cost, cost_v, cost_h, n_iter,
-                          algorithm)
+    if connect == 8:
+        cost_diag_dr = np.empty((height - 1, width - 1), dtype=unary_cost.dtype)
+        cost_diag_dr.fill(1. / np.sqrt(2))
+        cost_diag_dl = np.empty((height - 1, width - 1), dtype=unary_cost.dtype)
+        cost_diag_dl.fill(1. / np.sqrt(2))
+    else:
+        cost_diag_dr, cost_diag_dl = None, None
+
+    return cut_grid_graph(unary_cost, pairwise_cost, cost_v, cost_h,
+                          cost_diag_dr, cost_diag_dl, n_iter, algorithm)

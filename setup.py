@@ -45,11 +45,11 @@ gco_files += ['cgco.cpp']
 setup(name='gco-wrapper',
       url='http://vision.csd.uwo.ca/code/',
       author='Yujia',
-      maintainer='J. Borovec',
+      maintainer='Jiri Borovec',
       maintainer_email='jiri.borovec@fel.cvut.cz',
       license='MIT',
       platforms=['Linux'],
-      version='3.0.0',
+      version='3.0.1',
       description='pygco: a python wrapper for the graph cuts package',
       download_url='https://github.com/Borda/pyGCO',
       cmdclass={'build_ext': build_ext},
@@ -76,5 +76,7 @@ setup(name='gco-wrapper',
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
       ],
 )
