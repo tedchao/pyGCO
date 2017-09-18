@@ -249,7 +249,7 @@ class gco(object):
         _cgco.gcoInitLabelAtSite(self.handle, np.intc(site), np.intc(label))
 
 
-def cut_general_graph(edges, edge_weights, unary_cost, pairwise_cost,
+def cut_general_graph(edges, edge_weights, unary_cost, pairwise_cost=None,
                       n_iter=-1, algorithm='expansion', init_labels=None,
                       down_weight_factor=None):
     """
@@ -320,7 +320,8 @@ def cut_general_graph(edges, edge_weights, unary_cost, pairwise_cost,
     gc.set_data_cost(unary_cost / down_weight_factor)
     gc.set_all_neighbors(edges[:, 0], edges[:, 1],
                          edge_weights / down_weight_factor)
-    gc.set_smooth_cost(pairwise_cost)
+    if pairwise_cost is not None:
+        gc.set_smooth_cost(pairwise_cost)
 
     # initialize labels
     if init_labels is not None:

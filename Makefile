@@ -65,9 +65,8 @@ clean:
 	rm -f *.o gco_source/*.o test_wrapper
 
 rm:
-	rm -f *.o *.so gco_source/*.o *.zip
+	rm -f *.o *.so gco_source/*.o *.zip test_wrapper
 
 download:
-	./git_download.sh
-	#wget -N -O gco-v3.0.zip http://vision.csd.uwo.ca/code/gco-v3.0.zip
-	#unzip -o gco-v3.0.zip -d  ./gco_source
+	wget -N -O gco-v3.0.zip http://vision.csd.uwo.ca/code/gco-v3.0.zip
+	unzip -o gco-v3.0.zip -d  ./gco_source

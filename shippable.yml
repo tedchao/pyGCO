@@ -11,6 +11,7 @@ python:
   - 2.7
   - 3.4
   - 3.5
+  - 3.6
 
 cache: pip
 
@@ -29,7 +30,6 @@ install:
   - make download
   - make all
   - make test_wrapper
-  - ls libcgco.*
   - make rm
 
   - python setup.py build_ext --inplace
@@ -40,9 +40,9 @@ before_script:
   - mkdir -p shippable/codecoverage
 
 script:
-  - ls libcgco.*
 #  - ./test_wrapper
-  - python -m pytest --doctest-modules --ignore=setup.py
+  # - python -m pytest --doctest-modules --ignore=setup.py
+  - pytest --doctest-modules --ignore=setup.py
   - coverage run --source=pygco test_examples.py
   - coverage xml -o shippable/codecoverage/coverage.xml
 

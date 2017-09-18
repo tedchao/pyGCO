@@ -6,7 +6,7 @@ import matplotlib
 matplotlib.use('Agg') # Force matplotlib to not use any Xwindows backend.
 import matplotlib.pyplot as plt
 
-import pygco
+from pygco import pygco
 PLOT_SIZE = 6
 
 
