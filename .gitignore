@@ -2,6 +2,9 @@
 *.pyc
 *.o
 *.so
-test_wrapper
 .coverage
 .idea
+build
+test_wrapper
+__pycache__
+pygco.egg-info

@@ -1,13 +1,14 @@
-#!/bin/env python
-
 import numpy as np
 import ctypes as ct
-from cgco import _cgco
+try:
+    from cgco import _cgco
+except:
+    from .cgco import _cgco
 
 # keep 4 effective digits for the fractional part if using real potentials
 # make sure pairwise * smooth = unary so that the unary potentials and pairwise
 # potentials are on the same scale.
-_MAX_ENERGY_TERM_SCALE = 10000000 
+_MAX_ENERGY_TERM_SCALE = 10000000
 _UNARY_FLOAT_PRECISION = 100000
 _PAIRWISE_FLOAT_PRECISION = 1000
 _SMOOTH_COST_PRECISION = 100
@@ -109,12 +110,12 @@ class gco(object):
             return e
 
     def set_data_cost(self, unary):
-        """Set unary potentials, unary should be a matrix of size 
+        """Set unary potentials, unary should be a matrix of size
         nb_sites x nb_labels. unary can be either integers or float"""
-        
+
         if (self.nb_sites, self.nb_labels) != unary.shape:
             raise ShapeMismatchError(
-                    "Shape of unary potentials does not match the graph.")
+                "Shape of unary potentials does not match the graph.")
 
         # Just a reference
         self._unary = self._convert_unary_array(unary)
@@ -148,7 +149,7 @@ class gco(object):
                 or s2.max() >= self.nb_sites:
             raise IndexOutOfBoundError()
 
-        # These attributes are just used to keep a reference to corresponding 
+        # These attributes are just used to keep a reference to corresponding
         # arrays, otherwise the temporarily used arrays will be destroyed by
         # python's garbage collection system, and the C++ library won't have
         # access to them any more, which may cause trouble.
@@ -161,9 +162,9 @@ class gco(object):
             np.intc(self._edge_s1.size))
 
     def set_smooth_cost(self, cost):
-        """Set smooth cost. cost should be a symmetric numpy square matrix of 
+        """Set smooth cost. cost should be a symmetric numpy square matrix of
         size nb_labels x nb_labels.
-        
+
         cost[l1, l2] is the cost of labeling l1 as l2 (or l2 as l1)
         """
         if cost.shape[0] != cost.shape[1] or (cost != cost.T).any():
@@ -184,12 +185,12 @@ class gco(object):
             self._convert_smooth_cost_term(cost))
 
     def expansion(self, niters=-1):
-        """Do alpha-expansion for specified number of iterations. 
+        """Do alpha-expansion for specified number of iterations.
         Return total energy after the expansion moves.
         If niters is set to -1, the algorithm will run until convergence."""
         _cgco.gcoExpansion(self.handle, np.intc(niters), self.energy_temp_array)
         return self._convert_energy_back(self.energy_temp_array[0])
-        
+
     def expansion_on_alpha(self, label):
         """Do one alpha-expansion move for the specified label.
         Return True if the energy decreases, return False otherwise."""
@@ -248,7 +249,7 @@ class gco(object):
         _cgco.gcoInitLabelAtSite(self.handle, np.intc(site), np.intc(label))
 
 
-def cut_general_graph(edges, edge_weights, unary_cost, pairwise_cost, 
+def cut_general_graph(edges, edge_weights, unary_cost, pairwise_cost,
                       n_iter=-1, algorithm='expansion', init_labels=None,
                       down_weight_factor=None):
     """
@@ -295,23 +296,24 @@ def cut_general_graph(edges, edge_weights, unary_cost, pairwise_cost,
     array([0, 0, 0, 0, 0, 1, 1, 1, 1, 1], dtype=int32)
     """
     energy_is_float = (unary_cost.dtype in _float_types) or \
-            (edge_weights.dtype in _float_types) or \
-            (pairwise_cost.dtype in _float_types)
+        (edge_weights.dtype in _float_types) or \
+        (pairwise_cost.dtype in _float_types)
 
     if not energy_is_float and not (
-            (unary_cost.dtype in _int_types) and 
-            (edge_weights.dtype in _int_types) and 
+            (unary_cost.dtype in _int_types) and
+            (edge_weights.dtype in _int_types) and
             (pairwise_cost.dtype in _int_types)):
         raise DataTypeNotSupportedError(
-                "Unary and pairwise potentials should have consistent types. "
-                "Either integers of floats. Mixed types or other types are not "
-                "supported.")
+            "Unary and pairwise potentials should have consistent types. "
+            "Either integers of floats. Mixed types or other types are not "
+            "supported.")
 
     n_sites, n_labels = unary_cost.shape
 
     if down_weight_factor is None:
-        down_weight_factor = max(np.abs(unary_cost).max(), 
-                np.abs(edge_weights).max() * pairwise_cost.max()) + _SMALL_CONSTANT
+        down_weight_factor = max(np.abs(unary_cost).max(),
+                                 np.abs(edge_weights).max() *
+                                 pairwise_cost.max()) + _SMALL_CONSTANT
 
     gc = gco()
     gc.createGeneralGraph(n_sites, n_labels, energy_is_float)
@@ -410,7 +412,7 @@ def cut_grid_graph(unary_cost, pairwise_cost, cost_v, cost_h, cost_dr=None,
     pairwise_cost: ndarray, int32, shape=(n_labels, n_labels)
         Pairwise potentials for label compatibility
     cost_v: ndarray, int32, shape=(height-1, width)
-        Vertical edge weights. 
+        Vertical edge weights.
         cost_v[i,j] is the edge weight between (i,j) and (i+1,j)
     cost_h: ndarray, int32, shape=(height, width-1)
         Horizontal edge weights.
@@ -430,19 +432,19 @@ def cut_grid_graph(unary_cost, pairwise_cost, cost_v, cost_h, cost_dr=None,
     Note all the node indices start from 0.
     """
     energy_is_float = (unary_cost.dtype in _float_types) or \
-            (pairwise_cost.dtype in _float_types) or \
+        (pairwise_cost.dtype in _float_types) or \
             (cost_v.dtype in _float_types) or \
                       (cost_h.dtype in _float_types)
 
     if not energy_is_float and not (
-            (unary_cost.dtype in _int_types) and 
-            (pairwise_cost.dtype in _int_types) and
+        (unary_cost.dtype in _int_types) and
+        (pairwise_cost.dtype in _int_types) and
             (cost_v.dtype in _int_types) and
             (cost_h.dtype in _int_types)):
         raise DataTypeNotSupportedError(
-                "Unary and pairwise potentials should have consistent types. "
-                "Either integers of floats. Mixed types or other types are not "
-                "supported.")
+            "Unary and pairwise potentials should have consistent types. "
+            "Either integers of floats. Mixed types or other types are not "
+            "supported.")
 
     height, width, n_labels = unary_cost.shape
 

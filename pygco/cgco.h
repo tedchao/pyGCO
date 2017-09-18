@@ -1,7 +1,7 @@
 #ifndef __CGCO_H__
 #define __CGCO_H__
 
-#include "gco_source/GCoptimization.h"
+#include "GCoptimization.h"
 
 typedef GCoptimization::LabelID LabelID;
 typedef GCoptimization::SiteID SiteID;
@@ -20,7 +20,7 @@ extern "C" int gcoCreateGeneralGraph(SiteID numSites, LabelID numLabels, int *ha
 extern "C" int gcoDestroyGraph(int handle);
 
 /**
- * Set data cost. 
+ * Set data cost.
  *
  * unary should be an array of size numSites*numLabels stored in row major
  * order, so that dataCost(s, l) = unary[s*numLabels + l]
@@ -40,10 +40,10 @@ extern "C" int gcoSetNeighborPair(int handle, SiteID s1, SiteID s2, EnergyTermTy
 /**
  * Setup the whole neighbor system.
  *
- * s1, s2 and e are vectors of length nPairs. After the call, edge 
+ * s1, s2 and e are vectors of length nPairs. After the call, edge
  * (s1[i], s2[i]) will have weight e[i]
  *
- * Each element of s1 should be smaller than the corresponding element in s2, 
+ * Each element of s1 should be smaller than the corresponding element in s2,
  * otherwise the edge is ignored.
  */
 extern "C" int gcoSetAllNeighbors(int handle, SiteID *s1, SiteID *s2, EnergyTermType *e, int nPairs);
@@ -127,4 +127,3 @@ extern "C" int gcoGetLabels(int handle, LabelID *labels);
 extern "C" int gcoInitLabelAtSite(int handle, SiteID site, LabelID label);
 
 #endif // __CGCO_H__
-

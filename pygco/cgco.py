@@ -1,6 +1,8 @@
+import os
+import glob
+
 import numpy as np
 import ctypes as ct
-import os, glob
 
 # or change this to your own path that contains libcgco.so
 _CGCO_LIB_PATH = os.path.dirname(os.path.abspath(os.path.realpath(__file__)))
@@ -17,6 +19,9 @@ else:  # not sure what it found...
     print('found libs: %s' % repr([os.path.basename(p) for p in LIST_LIBGCO]))
     _CGCO_LIB_NAME = os.path.basename(LIST_LIBGCO[0])
 assert os.path.exists(_CGCO_LIB_PATH), '%s' % _CGCO_LIB_PATH
+
+# _CGCO_LIB_PATH = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+# _CGCO_LIB_NAME = 'cgco'
 
 # change the type definition depending on your machine and the compiled GCO library
 _handle_type = ct.c_int
