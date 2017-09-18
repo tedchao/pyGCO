@@ -1,6 +1,6 @@
 CXX=g++
 CFLAGS=-fPIC
-INC=-Igco_source -Ipygco
+INC=-Igco_source -Igco
 
 all: libcgco.so test_wrapper
 
@@ -51,9 +51,9 @@ gco_source/GCoptimization.o: \
 	    -o gco_source/GCoptimization.o
 
 cgco.o: \
-    pygco/cgco.cpp gco_source/GCoptimization.h
+    gco/cgco.cpp gco_source/GCoptimization.h
 	$(CXX) $(CFLAGS) $(INC) \
-	    -c pygco/cgco.cpp \
+	    -c gco/cgco.cpp \
 	    -o cgco.o
 
 test_wrapper: \

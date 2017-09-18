@@ -6,7 +6,7 @@ import matplotlib
 matplotlib.use('Agg') # Force matplotlib to not use any Xwindows backend.
 import matplotlib.pyplot as plt
 
-from pygco import pygco
+import gco
 PLOT_SIZE = 6
 
 
@@ -47,11 +47,9 @@ PLOT_SIZE = 6
 #     return [edges, edge_weights]
 
 
-
-
 def test_gc():
     """  """
-    gc = pygco.gco()
+    gc = gco.gco()
     gc.createGeneralGraph(3, 2, True)
     gc.handle is not None
     gc.destroy_graph()
@@ -67,8 +65,8 @@ def test_integer():
     edge_weight = np.array([3, 10, 1])
     smooth = 1 - np.eye(3)
 
-    labels = pygco.cut_general_graph(edges, edge_weight, unary, smooth,
-                                     n_iter=1)
+    labels = gco.cut_general_graph(edges, edge_weight, unary, smooth,
+                                   n_iter=1)
     assert np.array_equal(labels, np.array([0, 2, 2, 1]))
 
 
@@ -83,9 +81,18 @@ def test_float():
     smooth = (1 - np.eye(3)).astype(np.float)
     edge_weights = np.array([2.0, 0.0, 0.0])
 
-    labels = pygco.cut_general_graph(edges, edge_weights, unary, smooth,
-                                     n_iter=-1, algorithm="swap")
+    labels = gco.cut_general_graph(edges, edge_weights, unary, smooth,
+                                   n_iter=-1, algorithm="swap")
     assert np.array_equal(labels, np.array([0, 2, 1]))
+
+
+def draw_unary(axarr, unary):
+    for i in range(unary.shape[-1]):
+        axarr[i].set_title('unary term #%i' % i)
+        bm = axarr[i].imshow(unary[:, :, i], cmap='gray', interpolation='nearest')
+        plt.colorbar(bm, ax=axarr[i])
+        # plt.contour(annot, colors='r')
+
 
 
 def test_grid():
@@ -106,17 +113,12 @@ def test_grid():
 
     fig, axarr = plt.subplots(ncols=unary.shape[-1],
                               figsize=(unary.shape[-1] * PLOT_SIZE, PLOT_SIZE))
-    for i in range(unary.shape[-1]):
-        axarr[i].set_title('unary term #%i' % i)
-        bm = axarr[i].imshow(unary[:, :, i], cmap='gray',
-                             interpolation='nearest')
-        plt.colorbar(bm, ax=axarr[i])  # , plt.contour(annot, colors='r')
-
+    draw_unary(axarr, unary)
     fig.tight_layout()
     fig.savefig('./images/grid_unary.png')
 
     pairwise = (1 - np.eye(3)) * 10
-    labels = pygco.cut_grid_graph_simple(unary, pairwise, n_iter=-1)
+    labels = gco.cut_grid_graph_simple(unary, pairwise, n_iter=-1)
 
     fig, axarr = plt.subplots(ncols=2, figsize=(2 * PLOT_SIZE, PLOT_SIZE))
     axarr[0].set_title('original annotation')
@@ -147,10 +149,7 @@ def test_binary():
 
     fig, axarr = plt.subplots(ncols=unary.shape[-1],
                               figsize=(unary.shape[-1] * PLOT_SIZE, PLOT_SIZE))
-    for i in range(unary.shape[-1]):
-        axarr[i].set_title('unary term #%i' % i)
-        bm = axarr[i].imshow(unary[:, :, i], cmap='gray', interpolation='nearest')
-        plt.colorbar(bm, ax=axarr[i])  # , plt.contour(annot, colors='r')
+    draw_unary(axarr, unary)
     fig.tight_layout()
     fig.savefig('./images/binary_unary.png')
 
@@ -162,8 +161,8 @@ def test_binary():
     #   randn(unary.shape[0], unary.shape[1], unary.shape[2])*0,
     #   pw_cost*0, n_iter=-1)
 
-    labels = pygco.cut_grid_graph_simple(unary, smooth, n_iter=-1)
-    labels_0 = pygco.cut_grid_graph_simple(unary, smooth * 0., n_iter=-1)
+    labels = gco.cut_grid_graph_simple(unary, smooth, n_iter=-1)
+    labels_0 = gco.cut_grid_graph_simple(unary, smooth * 0., n_iter=-1)
 
     fig, axarr = plt.subplots(ncols=3, figsize=(3 * PLOT_SIZE, PLOT_SIZE))
     axarr[0].set_title('image')
@@ -178,8 +177,8 @@ def test_binary():
     fig.tight_layout()
     fig.savefig('./images/binary_labels-4conn.png'), plt.close()
 
-    labels = pygco.cut_grid_graph_simple(unary, smooth, connect=8, n_iter=-1)
-    labels_0 = pygco.cut_grid_graph_simple(unary, smooth * 0., connect=8, n_iter=-1)
+    labels = gco.cut_grid_graph_simple(unary, smooth, connect=8, n_iter=-1)
+    labels_0 = gco.cut_grid_graph_simple(unary, smooth * 0., connect=8, n_iter=-1)
 
     fig, axarr = plt.subplots(ncols=3, figsize=(3 * PLOT_SIZE, PLOT_SIZE))
     axarr[0].set_title('image')

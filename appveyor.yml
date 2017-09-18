@@ -52,8 +52,6 @@ build_script:
   - dir
 
 test_script:
-  # Run the project tests
-#  - ./test_wrapper
   - pytest --doctest-modules
 #  - nosetests --with-coverage   # --cover-package=pygco
 

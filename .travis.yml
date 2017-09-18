@@ -6,16 +6,16 @@
 # See doc/travis_notes.txt for some guidelines
 
 language:
-  - cpp
   - python
+  - cpp
 
 sudo: required
 
 python:
-  - 2.7
-  - 3.4
-  - 3.5
-  - 3.6
+  - "2.7"
+  - "3.4"
+  - "3.5"
+  - "3.6"
 
 # See http://docs.travis-ci.com/user/caching/#pip-cache
 cache: pip
@@ -27,25 +27,25 @@ before_install:
   - pip install --upgrade pip
 
 install:
-  - pip install -r requirements.txt --user
-  - pip install pytest>=3.1.3 coverage codecov nose --user
+  - pip install -r requirements.txt
+  - pip install pytest>=3.1.3 coverage codecov nose
 
   - make download
   - make all
-  - make test_wrapper
-  - ls libcgco.*
   - make rm
 
   - python setup.py build_ext --inplace
-#  - python setup.py install
 
 script:
-#  - ./test_wrapper
-  - nosetests pygco/pygco.py --exe --with-doctest
-  - nosetests test_examples.py --exe --with-doctest
-  - pytest --doctest-modules --ignore=setup.py
-  - coverage run --source=pygco test_examples.py
+  - nosetests gco --with-doctest --verbose
+  - nosetests test_examples.py --exe --with-doctest --verbose
+  # - pytest --doctest-modules --ignore=setup.py
+  - coverage run --source=gco test_examples.py
 
 after_success:
   - codecov --token=1aef0194-048a-4c59-a0d1-9408b924c493
   - coverage report
+
+  - python setup.py install
+  - rm -f -r gco
+  - python test_examples.py
