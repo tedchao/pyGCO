@@ -109,6 +109,13 @@ extern "C" int gcoSetPairSmoothCost(int handle, LabelID l1, LabelID l2, EnergyTe
     return 0;
 }
 
+extern "C" int gcoSetSmoothCostFunction(int handle, EnergyTermType (*fun)(SiteID, SiteID, LabelID, LabelID))
+{
+    GCoptimization *gco = findInstance(handle);
+    gco->setSmoothCost(fun);
+    return 0;
+}
+
 extern "C" int gcoExpansion(int handle, int maxNumIters, EnergyType *e)
 {
     GCoptimization *gco = findInstance(handle);

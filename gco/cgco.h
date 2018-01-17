@@ -66,6 +66,11 @@ extern "C" int gcoSetSmoothCost(int handle, EnergyTermType *e);
 extern "C" int gcoSetPairSmoothCost(int handle, LabelID l1, LabelID l2, EnergyTermType e);
 
 /**
+ * Set a smooth cost function given a pair of sites with corresponding labels.
+ */
+extern "C" int gcoSetSmoothCostFunction(int handle, EnergyTermType (*fun)(SiteID, SiteID, LabelID, LabelID));
+
+/**
  * Do alpha-expansion for a specified number of iterations.
  *
  * Return the total energy after the expansion moves.

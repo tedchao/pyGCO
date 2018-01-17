@@ -1,9 +1,9 @@
 import numpy as np
 import ctypes as ct
 try:
-    from cgco import _cgco
+    from cgco import _cgco, _SMOOTH_COST_FN
 except:
-    from .cgco import _cgco
+    from .cgco import _cgco, _SMOOTH_COST_FN
 
 # keep 4 effective digits for the fractional part if using real potentials
 # make sure pairwise * smooth = unary so that the unary potentials and pairwise
@@ -17,7 +17,6 @@ _int_types = [np.int, np.intc, np.int32, np.int64, np.longlong]
 _float_types = [np.float, np.float32, np.float64, np.float128]
 
 _SMALL_CONSTANT = 1e-10
-
 
 # error classes
 class PyGcoError(Exception):
@@ -63,6 +62,7 @@ class gco(object):
         self.nb_sites = np.intc(num_sites)
         self.nb_labels = np.intc(num_labels)
         self.energy_is_float = energy_is_float
+        self.smooth_cost_fun = None
 
     def destroy_graph(self):
         _cgco.gcoDestroyGraph(self.handle)
@@ -180,9 +180,19 @@ class gco(object):
         """Set smooth cost for a pair of labels l1, l2."""
         if not (0 <= l1 < self.nb_labels) or not (0 <= l2 < self.nb_labels):
             raise IndexOutOfBoundError()
-        _cgco.set_pair_smooth_cost(
+        _cgco.gcoSetPairSmoothCost(
                 self.handle, np.intc(l1), np.intc(l2),
             self._convert_smooth_cost_term(cost))
+
+    def set_smooth_cost_function(self, fun):
+        """Pass a function to calculate the smooth cost for sites s1 and s2 labeled l1 and l2.
+            Function is of from fun (s1, s1, l1, l2) -> cost
+        """
+        def _typesafe(s1, s2, l1, l2):
+            return self._convert_smooth_cost_term(fun(s1, s2, l1, l2))
+
+        self.smooth_cost_fun = _SMOOTH_COST_FN(_typesafe)
+        _cgco.gcoSetSmoothCostFunction(self.handle, self.smooth_cost_fun)
 
     def expansion(self, niters=-1):
         """Do alpha-expansion for specified number of iterations.

@@ -51,7 +51,7 @@ def test_gc():
     """  """
     gc = gco.gco()
     gc.createGeneralGraph(3, 2, True)
-    gc.handle is not None
+    assert gc.handle is not None
     gc.destroy_graph()
 
 
@@ -194,6 +194,24 @@ def test_binary():
     fig.savefig('./images/binary_labels-8conn.png'), plt.close()
 
 
+def test_cost_fun():
+    gc = gco.gco()
+    gc.createGeneralGraph(3, 2)
+    gc.set_data_cost(np.array([[8, 1], [8, 2], [2, 8]]))
+    gc.set_all_neighbors(np.arange(0, 2), np.arange(1, 3), np.ones(2))
+
+    def cost_fun(s1, s2, l1, l2):
+        if s1 == 0 and s2 == 1 and l1 == l2:
+            return 5
+        return 8
+
+    gc.set_smooth_cost_function(cost_fun)
+    gc.expansion()
+
+    labels = gc.get_labels()
+    assert np.array_equal(labels, np.array([1, 1, 0]))
+
+
 class TestGCO(unittest.TestCase):
 
     def test_all(self):
@@ -202,6 +220,7 @@ class TestGCO(unittest.TestCase):
         test_float()
         test_binary()
         test_grid()
+        test_cost_fun()
 
 
 if __name__ == "__main__":

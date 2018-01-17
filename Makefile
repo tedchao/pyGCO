@@ -59,7 +59,7 @@ cgco.o: \
 test_wrapper: \
     test_wrapper.cpp
 	$(CXX) $(INC) -L. test_wrapper.cpp \
-	    -o test_wrapper -Wl,-rpath=. -lcgco
+	    -o test_wrapper -Wl,-rpath,. -lcgco
 
 clean:
 	rm -f *.o gco_source/*.o test_wrapper
