@@ -8,7 +8,14 @@ import matplotlib.pyplot as plt
 
 import gco
 PLOT_SIZE = 6
+DIR_IMAGES = 'images'
 
+
+try:
+    if not os.path.isdir(DIR_IMAGES):
+        os.mkdir(DIR_IMAGES)
+except:
+    print('no permission to create a directory')
 
 # def get_uniform_smoothness_pw_single_image(img):
 #     """
@@ -115,7 +122,7 @@ def test_grid():
                               figsize=(unary.shape[-1] * PLOT_SIZE, PLOT_SIZE))
     draw_unary(axarr, unary)
     fig.tight_layout()
-    fig.savefig('./images/grid_unary.png')
+    fig.savefig(os.path.join(DIR_IMAGES, 'grid_unary.png'))
 
     pairwise = (1 - np.eye(3)) * 10
     labels = gco.cut_grid_graph_simple(unary, pairwise, n_iter=-1)
@@ -127,7 +134,7 @@ def test_grid():
     axarr[1].imshow(labels.reshape(*annot.shape), interpolation="nearest")
     axarr[1].contour(annot, colors='w')
     fig.tight_layout()
-    fig.savefig('./images/grid_labels.png'), plt.close()
+    fig.savefig(os.path.join(DIR_IMAGES, 'grid_labels.png')), plt.close()
 
 
 def test_binary():
@@ -151,7 +158,7 @@ def test_binary():
                               figsize=(unary.shape[-1] * PLOT_SIZE, PLOT_SIZE))
     draw_unary(axarr, unary)
     fig.tight_layout()
-    fig.savefig('./images/binary_unary.png')
+    fig.savefig(os.path.join(DIR_IMAGES, 'binary_unary.png'))
 
     # edges, edge_weights = get_uniform_smoothness_pw_single_image(img.shape)
     smooth = 1 - np.eye(2)
@@ -175,7 +182,7 @@ def test_binary():
     axarr[2].imshow(labels_0.reshape(*annot.shape), interpolation='nearest')
     axarr[2].contour(annot, colors='w')
     fig.tight_layout()
-    fig.savefig('./images/binary_labels-4conn.png'), plt.close()
+    fig.savefig(os.path.join(DIR_IMAGES, 'binary_labels-4conn.png')), plt.close()
 
     labels = gco.cut_grid_graph_simple(unary, smooth, connect=8, n_iter=-1)
     labels_0 = gco.cut_grid_graph_simple(unary, smooth * 0., connect=8, n_iter=-1)
@@ -191,7 +198,7 @@ def test_binary():
     axarr[2].imshow(labels_0.reshape(*annot.shape), interpolation='nearest')
     axarr[2].contour(annot, colors='w')
     fig.tight_layout()
-    fig.savefig('./images/binary_labels-8conn.png'), plt.close()
+    fig.savefig(os.path.join(DIR_IMAGES, 'binary_labels-8conn.png')), plt.close()
 
 
 def test_cost_fun():
@@ -226,7 +233,5 @@ class TestGCO(unittest.TestCase):
 if __name__ == "__main__":
     unittest.main()
 
-    if not os.path.exists('images'):
-        os.mkdir('images')
     test_binary()
     test_grid()
