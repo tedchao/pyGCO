@@ -35,9 +35,11 @@ DOWNLOAD_SOURCE = False
 
 
 def _parse_requirements(file_path):
-    pip_version = list(map(int, pkg_resources.get_distribution('pip').version.split('.')[:2]))
+    pip_ver = pkg_resources.get_distribution('pip').version
+    pip_version = list(map(int, pip_ver.split('.')[:2]))
     if pip_version >= [6, 0]:
-        raw = pip.req.parse_requirements(file_path, session=pip.download.PipSession())
+        raw = pip.req.parse_requirements(file_path,
+                                         session=pip.download.PipSession())
     else:
         raw = pip.req.parse_requirements(file_path)
     return [str(i.req) for i in raw]
@@ -79,15 +81,20 @@ if DOWNLOAD_SOURCE:
         # unzip the package
         with zipfile.ZipFile(PACKAGE_NAME, 'r') as zip_ref:
             zip_ref.extractall(LOCAL_SOURCE)
-    except:
-        logging.warning('Fail source download or unzip, so last VCS will be used.')
+    except Exception:
+        logging.warning('Fail download or unzip source, so local VCS is used.')
         #logging.warning(traceback.format_exc())
 
 
-source_files = ['graph.cpp', 'maxflow.cpp',
-                'LinkedBlockList.cpp', 'GCoptimization.cpp']
+source_files = [
+    'graph.cpp',
+    'maxflow.cpp',
+    'LinkedBlockList.cpp',
+    'GCoptimization.cpp'
+]
 gco_files = [os.path.join(LOCAL_SOURCE, f) for f in source_files]
-gco_files += [os.path.join('gco', 'cgco.cpp')]
+gco_files += [os.path.join('gco',
+                           'cgco.cpp')]
 
 
 # parse_requirements() returns generator of pip.req.InstallRequirement objects
@@ -134,9 +141,14 @@ setup(name='gco-wrapper',
       # See https://PyPI.python.org/PyPI?%3Aaction=list_classifiers
       classifiers=[
         'Development Status :: 4 - Beta',
-        'Intended Audience :: Developers',
+        "Environment :: Console",
+        "Intended Audience :: Developers",
+        "Intended Audience :: Information Technology",
+        "Intended Audience :: Education",
+        "Intended Audience :: Science/Research",
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
+        "Topic :: Scientific/Engineering :: Image Segmentation",
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
         'Programming Language :: Python :: 2.7',
