@@ -2,7 +2,7 @@ import numpy as np
 import ctypes as ct
 try:
     from cgco import _cgco, _SMOOTH_COST_FN
-except:
+except Exception:
     from .cgco import _cgco, _SMOOTH_COST_FN
 
 # keep 4 effective digits for the fractional part if using real potentials
@@ -17,6 +17,7 @@ _int_types = [np.int, np.intc, np.int32, np.int64, np.longlong]
 _float_types = [np.float, np.float32, np.float64, np.float128]
 
 _SMALL_CONSTANT = 1e-10
+
 
 # error classes
 class PyGcoError(Exception):
@@ -39,11 +40,11 @@ class IndexOutOfBoundError(PyGcoError):
     pass
 
 
-class gco(object):
+class GCO(object):
     def __init__(self):
         pass
 
-    def createGeneralGraph(self, num_sites, num_labels, energy_is_float=False):
+    def create_general_graph(self, num_sites, num_labels, energy_is_float=False):
         """ Create a general graph with specified number of sites and labels.
         If energy_is_float is set to True, then automatic scaling and rounding
         will be applied to convert all energies to integers when running graph
@@ -56,7 +57,8 @@ class gco(object):
         """
         self.temp_array = np.empty(1, dtype=np.intc)
         self.energy_temp_array = np.empty(1, dtype=np.longlong)
-        _cgco.gcoCreateGeneralGraph(np.intc(num_sites), np.intc(num_labels), self.temp_array)
+        _cgco.gcoCreateGeneralGraph(np.intc(num_sites), np.intc(num_labels),
+                                    self.temp_array)
 
         self.handle = self.temp_array[0]
         self.nb_sites = np.intc(num_sites)
@@ -157,9 +159,8 @@ class gco(object):
         self._edge_s2 = s2.astype(np.intc)
         self._edge_w = self._convert_pairwise_array(w)
 
-        _cgco.gcoSetAllNeighbors(
-                self.handle, self._edge_s1, self._edge_s2, self._edge_w,
-            np.intc(self._edge_s1.size))
+        _cgco.gcoSetAllNeighbors(self.handle, self._edge_s1, self._edge_s2,
+                                 self._edge_w, np.intc(self._edge_s1.size))
 
     def set_smooth_cost(self, cost):
         """Set smooth cost. cost should be a symmetric numpy square matrix of
@@ -180,9 +181,8 @@ class gco(object):
         """Set smooth cost for a pair of labels l1, l2."""
         if not (0 <= l1 < self.nb_labels) or not (0 <= l2 < self.nb_labels):
             raise IndexOutOfBoundError()
-        _cgco.gcoSetPairSmoothCost(
-                self.handle, np.intc(l1), np.intc(l2),
-            self._convert_smooth_cost_term(cost))
+        _cgco.gcoSetPairSmoothCost(self.handle, np.intc(l1), np.intc(l2),
+                                   self._convert_smooth_cost_term(cost))
 
     def set_smooth_cost_function(self, fun):
         """Pass a function to calculate the smooth cost for sites s1 and s2 labeled l1 and l2.
@@ -325,8 +325,8 @@ def cut_general_graph(edges, edge_weights, unary_cost, pairwise_cost=None,
                                  np.abs(edge_weights).max() *
                                  pairwise_cost.max()) + _SMALL_CONSTANT
 
-    gc = gco()
-    gc.createGeneralGraph(n_sites, n_labels, energy_is_float)
+    gc = GCO()
+    gc.create_general_graph(n_sites, n_labels, energy_is_float)
     gc.set_data_cost(unary_cost / down_weight_factor)
     gc.set_all_neighbors(edges[:, 0], edges[:, 1],
                          edge_weights / down_weight_factor)
@@ -443,8 +443,8 @@ def cut_grid_graph(unary_cost, pairwise_cost, cost_v, cost_h, cost_dr=None,
     Note all the node indices start from 0.
     """
     energy_is_float = (unary_cost.dtype in _float_types) or \
-        (pairwise_cost.dtype in _float_types) or \
-            (cost_v.dtype in _float_types) or \
+                      (pairwise_cost.dtype in _float_types) or \
+                      (cost_v.dtype in _float_types) or \
                       (cost_h.dtype in _float_types)
 
     if not energy_is_float and not (
@@ -459,8 +459,8 @@ def cut_grid_graph(unary_cost, pairwise_cost, cost_v, cost_h, cost_dr=None,
 
     height, width, n_labels = unary_cost.shape
 
-    gc = gco()
-    gc.createGeneralGraph(height * width, n_labels, energy_is_float)
+    gc = GCO()
+    gc.create_general_graph(height * width, n_labels, energy_is_float)
     gc.set_data_cost(unary_cost.reshape([height * width, n_labels]))
 
     v_edges_from, h_edges_from, v_edges_to, h_edges_to = \

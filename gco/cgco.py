@@ -38,7 +38,8 @@ _energy_type = ct.c_longlong    # default type long long
 _energy_ptr_type = np.ctypeslib.ndpointer(dtype=np.longlong)
 _success_ptr_type = np.ctypeslib.ndpointer(dtype=np.intc)
 
-_SMOOTH_COST_FN = ct.CFUNCTYPE(_energy_term_type, ct.c_int, ct.c_int, _label_id_type, _label_id_type)
+_SMOOTH_COST_FN = ct.CFUNCTYPE(_energy_term_type, ct.c_int, ct.c_int,
+                               _label_id_type, _label_id_type)
 
 # load cgco shared library
 _cgco = np.ctypeslib.load_library(_CGCO_LIB_NAME, _CGCO_LIB_PATH)

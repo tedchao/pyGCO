@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import gco
 PLOT_SIZE = 6
 DIR_IMAGES = 'images'
+np.random.seed(0)
 
 
 try:
@@ -56,8 +57,8 @@ except:
 
 def test_gc():
     """  """
-    gc = gco.gco()
-    gc.createGeneralGraph(3, 2, True)
+    gc = gco.GCO()
+    gc.create_general_graph(3, 2, True)
     assert gc.handle is not None
     gc.destroy_graph()
 
@@ -99,7 +100,6 @@ def draw_unary(axarr, unary):
         bm = axarr[i].imshow(unary[:, :, i], cmap='gray', interpolation='nearest')
         plt.colorbar(bm, ax=axarr[i])
         # plt.contour(annot, colors='r')
-
 
 
 def test_grid():
@@ -202,8 +202,8 @@ def test_binary():
 
 
 def test_cost_fun():
-    gc = gco.gco()
-    gc.createGeneralGraph(3, 2)
+    gc = gco.GCO()
+    gc.create_general_graph(3, 2)
     gc.set_data_cost(np.array([[8, 1], [8, 2], [2, 8]]))
     gc.set_all_neighbors(np.arange(0, 2), np.arange(1, 3), np.ones(2))
 
