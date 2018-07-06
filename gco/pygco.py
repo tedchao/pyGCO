@@ -570,7 +570,7 @@ def cut_grid_graph_simple(unary_cost, pairwise_cost, n_iter=-1,
            [0, 0, 0, 1, 1, 1, 1, 1, 2, 2],
            [0, 0, 0, 1, 1, 1, 1, 1, 2, 2],
            [0, 0, 0, 1, 1, 1, 1, 1, 2, 2],
-           [0, 0, 0, 1, 1, 1, 1, 1, 2, 2],
+           [0, 0, 0, 0, 1, 1, 1, 2, 2, 2],
            [0, 0, 0, 0, 0, 0, 2, 2, 2, 2],
            [0, 0, 0, 0, 0, 0, 2, 2, 2, 2],
            [0, 0, 0, 0, 0, 0, 2, 2, 2, 2],
@@ -582,9 +582,9 @@ def cut_grid_graph_simple(unary_cost, pairwise_cost, n_iter=-1,
 
     if connect == 8:
         cost_diag_dr = np.empty((height - 1, width - 1), dtype=unary_cost.dtype)
-        cost_diag_dr.fill(1. / np.sqrt(2))
+        cost_diag_dr.fill(np.sqrt(2))
         cost_diag_dl = np.empty((height - 1, width - 1), dtype=unary_cost.dtype)
-        cost_diag_dl.fill(1. / np.sqrt(2))
+        cost_diag_dl.fill(np.sqrt(2))
     else:
         cost_diag_dr, cost_diag_dl = None, None
 

@@ -108,7 +108,7 @@ except:
 setup(name='gco-wrapper',
       url='http://vision.csd.uwo.ca/code/',
       packages=['gco'],
-      version='3.0.2',
+      version='3.0.3',
       license='MIT',
 
       author='Yujia Li & A. Mueller',
@@ -148,7 +148,7 @@ setup(name='gco-wrapper',
         "Intended Audience :: Science/Research",
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
-        "Topic :: Scientific/Engineering :: Image Segmentation",
+        # "Topic :: Scientific/Engineering :: Image Segmentation",
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
         'Programming Language :: Python :: 2.7',
