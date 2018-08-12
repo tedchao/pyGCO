@@ -28,21 +28,17 @@ except ImportError:
     from distutils.core import setup, Extension # , Command, find_packages
     from distutils.command.build_ext import build_ext
 
+HERE = os.path.abspath(os.path.dirname(__file__))
 PACKAGE_NAME = 'gco-v3.0.zip'
-GCO_LIB = 'http://vision.csd.uwo.ca/code/' + PACKAGE_NAME
+URL_LIB_GCO = 'http://vision.csd.uwo.ca/code/' + PACKAGE_NAME
 LOCAL_SOURCE = 'gco_source'
 DOWNLOAD_SOURCE = False
 
 
 def _parse_requirements(file_path):
-    pip_ver = pkg_resources.get_distribution('pip').version
-    pip_version = list(map(int, pip_ver.split('.')[:2]))
-    if pip_version >= [6, 0]:
-        raw = pip.req.parse_requirements(file_path,
-                                         session=pip.download.PipSession())
-    else:
-        raw = pip.req.parse_requirements(file_path)
-    return [str(i.req) for i in raw]
+    with open(file_path) as fp:
+        reqs = [r.rstrip() for r in fp.readlines() if not r.startswith('#')]
+        return reqs
 
 
 class BuildExt(build_ext):
@@ -67,7 +63,7 @@ if DOWNLOAD_SOURCE:
         # download code
         if not os.path.exists(PACKAGE_NAME):
             http = urllib3.PoolManager()
-            with http.request('GET', GCO_LIB, preload_content=False) as resp, \
+            with http.request('GET', URL_LIB_GCO, preload_content=False) as resp, \
                     open(PACKAGE_NAME, 'wb') as out_file:
                 shutil.copyfileobj(resp, out_file)
             resp.release_conn()
@@ -93,16 +89,8 @@ source_files = [
     'GCoptimization.cpp'
 ]
 gco_files = [os.path.join(LOCAL_SOURCE, f) for f in source_files]
-gco_files += [os.path.join('gco',
-                           'cgco.cpp')]
-
-
-# parse_requirements() returns generator of pip.req.InstallRequirement objects
-try:
-    install_reqs = _parse_requirements("requirements.txt")
-except:
-    logging.warning('Fail load requirements file, so using default ones.')
-    install_reqs = ['Cython', 'numpy']
+gco_files += [os.path.join('gco', 'cgco.cpp')]
+install_reqs = _parse_requirements(os.path.join(HERE, 'requirements.txt'))
 
 
 setup(name='gco-wrapper',

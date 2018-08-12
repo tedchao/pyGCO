@@ -34,6 +34,7 @@ install:
   - make all
   - make rm
 
+  - python setup.py check -m -s
   - python setup.py build_ext --inplace
 
 script:
