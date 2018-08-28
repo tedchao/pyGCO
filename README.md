@@ -7,7 +7,6 @@
 [![Run Status](https://api.shippable.com/projects/5883a5e12a5d900f00b8b9ff/badge?branch=master)](https://app.shippable.com/github/Borda/pyGCO)
 [![Coverage Badge](https://api.shippable.com/projects/5883a5e12a5d900f00b8b9ff/coverageBadge?branch=master)](https://app.shippable.com/github/Borda/pyGCO)
 [![Maintainability](https://api.codeclimate.com/v1/badges/9c11485e2f4f23189069/maintainability)](https://codeclimate.com/github/Borda/pyGCO/maintainability)
-[![Codeship Status for Borda/pygco](https://app.codeship.com/projects/a130c6b0-c251-0134-f78c-26017824c46f/status?branch=master)](https://app.codeship.com/projects/197423)
 
 The original wrapper is [pygco](https://github.com/yujiali/pygco)
 
