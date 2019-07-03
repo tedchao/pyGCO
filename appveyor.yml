@@ -35,6 +35,9 @@ install:
   # purpose but it is problematic because it tends to cancel builds pushed
   # directly to master instead of just PR builds (or the converse).
   # credits: JuliaLang developers.
+  - SET PATH=%PYTHON%;%PYTHON%\\Scripts;%path%
+  - python --version
+  - pip --version
   - pip install -r requirements.txt
   - pip install pytest  # nose coverage
 
@@ -44,11 +47,11 @@ install:
 
 build_script:
   # Build the compiled extension
-#  - nmake -f Makefile download
-#  - nmake -f Makefile all
-#  - nmake -f Makefile test_wrapper
+  # - nmake -f Makefile download
+  # - nmake -f Makefile all
+  # - nmake -f Makefile test_wrapper
   - python setup.py build_ext --inplace
-#  - python setup.py install
+  # - python setup.py install
   - dir
 
 test_script:
