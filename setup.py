@@ -17,10 +17,7 @@ Release package
 """
 
 import os
-import pip
-import logging
-import pkg_resources
-# import traceback
+
 try:
     from setuptools import setup, Extension # , Command, find_packages
     from setuptools.command.build_ext import build_ext
@@ -28,21 +25,14 @@ except ImportError:
     from distutils.core import setup, Extension # , Command, find_packages
     from distutils.command.build_ext import build_ext
 
-PACKAGE_NAME = 'gco-v3.0.zip'
-GCO_LIB = 'http://vision.csd.uwo.ca/code/' + PACKAGE_NAME
+HERE = os.path.abspath(os.path.dirname(__file__))
 LOCAL_SOURCE = 'gco_source'
-DOWNLOAD_SOURCE = False
 
 
 def _parse_requirements(file_path):
-    pip_ver = pkg_resources.get_distribution('pip').version
-    pip_version = list(map(int, pip_ver.split('.')[:2]))
-    if pip_version >= [6, 0]:
-        raw = pip.req.parse_requirements(file_path,
-                                         session=pip.download.PipSession())
-    else:
-        raw = pip.req.parse_requirements(file_path)
-    return [str(i.req) for i in raw]
+    with open(file_path) as fp:
+        reqs = [r.rstrip() for r in fp.readlines() if not r.startswith('#')]
+        return reqs
 
 
 class BuildExt(build_ext):
@@ -59,51 +49,38 @@ class BuildExt(build_ext):
         self.include_dirs.append(numpy.get_include())
 
 
-if DOWNLOAD_SOURCE:
-    try:
-        import urllib3
-        import zipfile
-        import shutil
-        # download code
-        if not os.path.exists(PACKAGE_NAME):
-            http = urllib3.PoolManager()
-            with http.request('GET', GCO_LIB, preload_content=False) as resp, \
-                    open(PACKAGE_NAME, 'wb') as out_file:
-                shutil.copyfileobj(resp, out_file)
-            resp.release_conn()
-
-        # try:
-        #     if not os.path.exists(LOCAL_SOURCE):
-        #         os.mkdir(LOCAL_SOURCE)
-        # except:
-        #     print('no permission to create a directory')
-
-        # unzip the package
-        with zipfile.ZipFile(PACKAGE_NAME, 'r') as zip_ref:
-            zip_ref.extractall(LOCAL_SOURCE)
-    except Exception:
-        logging.warning('Fail download or unzip source, so local VCS is used.')
-        #logging.warning(traceback.format_exc())
+# if DOWNLOAD_SOURCE:
+#     PACKAGE_NAME = 'gco-v3.0.zip'
+#     GCO_LIB = 'http://vision.csd.uwo.ca/code/' + PACKAGE_NAME
+#     try:
+#         import urllib3
+#         import zipfile
+#         import shutil
+#         # download code
+#         if not os.path.exists(PACKAGE_NAME):
+#             http = urllib3.PoolManager()
+#             with http.request('GET', GCO_LIB, preload_content=False) as resp, \
+#                     open(PACKAGE_NAME, 'wb') as out_file:
+#                 shutil.copyfileobj(resp, out_file)
+#             resp.release_conn()
+#
+#         # unzip the package
+#         with zipfile.ZipFile(PACKAGE_NAME, 'r') as zip_ref:
+#             zip_ref.extractall(LOCAL_SOURCE)
+#     except Exception:
+#         logging.warning('Fail download or unzip source, so local VCS is used.')
 
 
-source_files = [
+SOURCE_FILES = [
     'graph.cpp',
     'maxflow.cpp',
     'LinkedBlockList.cpp',
-    'GCoptimization.cpp'
+    'GCoptimization.cpp',
 ]
-gco_files = [os.path.join(LOCAL_SOURCE, f) for f in source_files]
-gco_files += [os.path.join('gco',
-                           'cgco.cpp')]
+gco_files = [os.path.join(LOCAL_SOURCE, f) for f in SOURCE_FILES]
+gco_files += [os.path.join('gco', 'cgco.cpp')]
 
-
-# parse_requirements() returns generator of pip.req.InstallRequirement objects
-try:
-    install_reqs = _parse_requirements("requirements.txt")
-except:
-    logging.warning('Fail load requirements file, so using default ones.')
-    install_reqs = ['Cython', 'numpy']
-
+install_reqs = _parse_requirements(os.path.join(HERE, 'requirements.txt'))
 
 setup(name='gco-wrapper',
       url='http://vision.csd.uwo.ca/code/',
@@ -121,14 +98,16 @@ setup(name='gco-wrapper',
 
       zip_safe=False,
       cmdclass={'build_ext': BuildExt},
-      ext_modules=[Extension('gco.libcgco',
-                             gco_files,
-                             language='c++',
-                             include_dirs=[LOCAL_SOURCE],
-                             library_dirs=[LOCAL_SOURCE],
-                             extra_compile_args=["-fpermissive"]
-                   )],
-      setup_requires=['numpy'],
+      ext_modules=[
+          Extension('gco.libcgco',
+                    gco_files,
+                    language='c++',
+                    include_dirs=[LOCAL_SOURCE],
+                    library_dirs=[LOCAL_SOURCE],
+                    # extra_compile_args=["-fpermissive"],
+                    ),
+      ],
+      setup_requires=['numpy<1.17'],  # numpy v1.17 drops support for py2
       install_requires=install_reqs,
       # test_suite='nose.collector',
       # tests_require=['nose'],
@@ -140,20 +119,22 @@ setup(name='gco-wrapper',
                        'algorithm for optimization in Markov Random Fields.',
       # See https://PyPI.python.org/PyPI?%3Aaction=list_classifiers
       classifiers=[
-        'Development Status :: 4 - Beta',
-        "Environment :: Console",
-        "Intended Audience :: Developers",
-        "Intended Audience :: Information Technology",
-        "Intended Audience :: Education",
-        "Intended Audience :: Science/Research",
-        'License :: OSI Approved :: MIT License',
-        'Natural Language :: English',
-        # "Topic :: Scientific/Engineering :: Image Segmentation",
-        # Specify the Python versions you support here. In particular, ensure
-        # that you indicate whether you support Python 2, Python 3 or both.
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
+          "Development Status :: 4 - Beta",
+          "Environment :: Console",
+          "Intended Audience :: Developers",
+          "Intended Audience :: Information Technology",
+          "Intended Audience :: Education",
+          "Intended Audience :: Science/Research",
+          "License :: OSI Approved :: MIT License",
+          "Natural Language :: English",
+          # "Topic :: Scientific/Engineering :: Image Segmentation",
+          # Specify the Python versions you support here. In particular, ensure
+          # that you indicate whether you support Python 2, Python 3 or both.
+          "Programming Language :: Python :: 2",
+          "Programming Language :: Python :: 2.7",
+          "Programming Language :: Python :: 3",
+          "Programming Language :: Python :: 3.4",
+          "Programming Language :: Python :: 3.5",
+          "Programming Language :: Python :: 3.6",
       ],
 )

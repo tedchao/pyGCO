@@ -13,19 +13,19 @@ environment:
     # See: http://www.appveyor.com/docs/installed-software#python
 
     - PYTHON: "C:\\Python27"
-      PYTHON_VERSION: "2.7.x" # currently 2.7.9
+      PYTHON_VERSION: "2.7.x"
       PYTHON_ARCH: "32"
 
     - PYTHON: "C:\\Python27-x64"
-      PYTHON_VERSION: "2.7.x" # currently 2.7.9
+      PYTHON_VERSION: "2.7.x"
       PYTHON_ARCH: "64"
 
-    - PYTHON: "C:\\Python34"
-      PYTHON_VERSION: "3.4.x" # currently 3.4.3
+    - PYTHON: "C:\\Python36"
+      PYTHON_VERSION: "3.6.x"
       PYTHON_ARCH: "32"
 
-    - PYTHON: "C:\\Python34-x64"
-      PYTHON_VERSION: "3.4.x" # currently 3.4.3
+    - PYTHON: "C:\\Python36-x64"
+      PYTHON_VERSION: "3.6.x"
       PYTHON_ARCH: "64"
 
 
@@ -40,10 +40,7 @@ install:
   - pip --version
   - pip install -r requirements.txt
   - pip install pytest  # nose coverage
-
-#before_build:
-#  - mkdir gco_source
-#  -
+  - pip list
 
 build_script:
   # Build the compiled extension
@@ -57,10 +54,6 @@ build_script:
 test_script:
   - pytest --doctest-modules
 #  - nosetests --with-coverage   # --cover-package=pygco
-
-#after_test:
-#  # If tests are successful, create binary packages for the project.
-#  -
 
 on_success:
   - coverage report
