@@ -47,6 +47,9 @@ class BuildExt(build_ext):
         # __builtins__.__NUMPY_SETUP__ = False
         import numpy
         self.include_dirs.append(numpy.get_include())
+    
+    def get_export_symbols(self):
+        return None
 
 
 # if DOWNLOAD_SOURCE:
