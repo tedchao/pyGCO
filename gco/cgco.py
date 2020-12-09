@@ -17,6 +17,8 @@ elif '.lib' in lib_exts:
     _CGCO_LIB_NAME = LIST_LIBGCO[lib_exts.index('.lib')]
 elif '.dll' in lib_exts:
     _CGCO_LIB_NAME = LIST_LIBGCO[lib_exts.index('.dll')]
+elif '.pyd' in lib_exts:
+    _CGCO_LIB_NAME = LIST_LIBGCO[lib_exts.index('.pyd')]
 else:  # not sure what it found...
     print('found libs: %s' % repr([os.path.basename(p) for p in LIST_LIBGCO]))
     _CGCO_LIB_NAME = os.path.basename(LIST_LIBGCO[0])
