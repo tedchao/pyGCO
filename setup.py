@@ -48,7 +48,7 @@ class BuildExt(build_ext):
         import numpy
         self.include_dirs.append(numpy.get_include())
     
-    def get_export_symbols(self):
+    def get_export_symbols(self,ext):
         return None
 
 
